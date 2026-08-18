@@ -1,0 +1,1516 @@
+<!-- Eigrutel Lab - Atelier d'outils libres pour la bande dessinée
+Programme conçu et développé par Simon Léturgie dans le cadre d'Eigrutel BD Academy.
+Nom : Pop!
+Version : 1.0.0
+Date : 18-08-2026
+Code : GNU AGPL v3.0 ou version ultérieure.
+Documentation et modèles : CC BY-SA 4.0, sauf mention contraire.
+Marques, logos et signes distinctifs Eigrutel / Eigrutel Lab / Eigrutel BD Academy : réservés. -->
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pop! — Eigrutel Lab</title>
+<link rel="icon" type="image/png" href="favicon/favpop.png">
+<link rel="apple-touch-icon" sizes="180x180" href="favicon/favpop.png">
+<meta name="apple-mobile-web-app-title" content="Pop!">
+<style>
+:root{
+  --bleu:#1F3A44;
+  --bleu2:#2B5360;
+  --rouge:#A63D40;
+  --ocre:#C47A2C;
+  --vert:#8B8E5A;
+  --fond:#16272D;--idea-accent:#F2C94C;
+  --fond2:#182B32;
+  --papier:#FAFAF7;
+  --trait:rgba(250,250,247,.16);
+  --muted:rgba(250,250,247,.60);
+  --focus:#9FC3CF;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  overflow:hidden;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--fond);
+  color:var(--papier);
+}
+button,input,textarea{font:inherit}
+button{border:0;cursor:pointer}
+.app{height:100dvh;display:grid;grid-template-rows:auto 1fr auto}
+
+/* Barre supérieure / Top bar */
+.top{
+  z-index:90;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:10px;
+  padding:12px 18px;
+  background:var(--fond2);
+  border-bottom:1px solid var(--trait);
+}
+.kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  color:var(--rouge);
+  font-size:11px;
+  font-weight:850;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+.kicker:before,.kicker:after{content:"";width:24px;height:1px;background:currentColor;opacity:.65}
+h1{margin:3px 0 0;font-size:clamp(30px,4vw,46px);line-height:.95;letter-spacing:-.055em}
+.sub{margin:7px 0 0;color:#FFF52E;font-size:13px;font-weight:850}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
+.spaceNav{display:flex;gap:6px;align-items:center;padding:3px;border-radius:999px;background:#16272D;border:1px solid var(--trait)}
+.spaceBtn{min-height:32px;padding:0 13px;border-radius:999px;background:transparent;color:rgba(250,250,247,.72);font-size:12px;font-weight:850;border:0}
+.spaceBtn.active{background:var(--rouge);color:#fff}
+.spaceBtn:hover{background:rgba(250,250,247,.08)}
+.spaceBtn.active:hover{background:var(--rouge)}
+.btn{
+  min-height:36px;
+  border-radius:999px;
+  border:1px solid rgba(250,250,247,.18);
+  background:#20343B;
+  color:var(--papier);
+  padding:0 12px;
+  font-size:12px;
+  font-weight:820;
+}
+.btn:hover{background:#29434c}
+.btn.primary{background:var(--rouge);border-color:var(--rouge)}
+.btn.ocre{background:var(--ocre);border-color:var(--ocre)}
+.btn.danger{background:rgba(166,61,64,.28);border-color:rgba(166,61,64,.62);color:#fff}
+.btn.danger:hover{background:var(--rouge);border-color:var(--rouge)}
+.btn.icon{width:38px;min-width:38px;padding:0;font-size:17px}
+.btn.active{background:var(--bleu);border-color:rgba(250,250,247,.34)}
+.btn:disabled{opacity:.42;cursor:default}
+.ideaBtn,.historyBtn,.settingsBtn{height:40px;display:inline-flex;align-items:center;justify-content:center}
+.historyBtn,.settingsBtn{width:40px;min-width:40px;padding:0}
+.ideaBtn{width:auto;min-width:0;padding:0 15px;gap:8px;font-weight:900;border-width:2px;border-color:var(--idea-accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--idea-accent) 13%,transparent),0 8px 18px rgba(0,0,0,.14)}
+.ideaBtn{background:color-mix(in srgb,var(--idea-accent) 12%,#20343B)}
+.ideaBtn:hover{background:color-mix(in srgb,var(--idea-accent) 18%,#20343B);transform:translateY(-1px);box-shadow:0 0 0 3px color-mix(in srgb,var(--idea-accent) 16%,transparent),0 10px 22px rgba(0,0,0,.18)}
+.ideaBtn .ideaSpark{color:var(--idea-accent);font-size:20px;line-height:1;transform:translateY(-1px)}
+.historyBtn svg{width:19px;height:19px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.settingsBtn{display:grid;place-content:center;gap:4px}
+.settingsBtn span{display:block;width:18px;height:2px;border-radius:2px;background:currentColor}
+.historyBtns{display:flex;gap:6px;align-items:center}
+.settingsWrap{position:relative}
+.settingsMenu{position:absolute;right:0;top:calc(100% + 8px);z-index:80;display:none;width:260px;padding:9px;border-radius:17px;background:#20343B;border:1px solid var(--trait);box-shadow:0 18px 48px rgba(0,0,0,.34)}
+.settingsMenu.open{display:grid;gap:5px}
+.settingsMenu button,.settingsMenu label{width:100%}
+.settingsMenu button{min-height:38px;border-radius:11px;background:transparent;color:var(--papier);text-align:left;padding:9px 11px;font-size:12px;font-weight:850}
+.settingsMenu button:hover{background:rgba(250,250,247,.08)}
+.settingsMenu hr{width:100%;border:0;border-top:1px solid var(--trait);margin:4px 0}
+.settingsTheme{display:grid;grid-template-columns:1fr;gap:6px;padding:7px 8px}
+.settingsTheme span{font-size:10px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.settingsTheme select{appearance:auto;-webkit-appearance:menulist;width:100%;min-height:36px;border-radius:10px;border:1px solid rgba(250,250,247,.22);background:#16272D;color:var(--papier);padding:0 9px;font-size:12px;font-weight:850}
+.infoModal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.52);backdrop-filter:blur(3px)}
+.infoModal.open{display:flex}
+.infoBox{width:min(620px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto;background:#20343B;border:1px solid var(--trait);border-radius:22px;padding:18px;box-shadow:0 28px 70px rgba(0,0,0,.34)}
+.infoHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.infoHead h2{margin:0;font-size:18px}.infoBox p,.infoBox li{color:var(--muted);font-size:13px;line-height:1.55}.infoBox ul,.infoBox ol{padding-left:22px}.infoBox li{margin:0 0 9px}.infoBox strong{color:var(--papier)}
+html[data-theme=day]{--idea-accent:#C47A2C;--fond:#F4F1EA;--fond2:#FAFAF7;--papier:#243033;--trait:rgba(31,58,68,.16);--muted:rgba(31,58,68,.62);--focus:#1F3A44}
+html[data-theme=day] body,html[data-theme=day] .boardShell,html[data-theme=day] .scroll{background:#F4F1EA;color:#243033}
+html[data-theme=day] .workspace{background-color:#F4F1EA;background-image:radial-gradient(rgba(31,58,68,.09) 1px,transparent 1px)}
+html[data-theme=day] .top,html[data-theme=day] .status{background:#FAFAF7}
+html[data-theme=day] .btn,html[data-theme=day] .spaceNav{background:#fff;color:#1F3A44;border-color:rgba(31,58,68,.18)}
+html[data-theme=day] .ideaBtn{background:#FFF8EC;color:#1F3A44;border-color:var(--idea-accent)}
+html[data-theme=day] .spaceBtn{color:rgba(31,58,68,.72)}html[data-theme=day] .spaceBtn.active{background:#A63D40;color:#fff}
+html[data-theme=day] .settingsMenu,html[data-theme=day] .infoBox{background:#FAFAF7;color:#243033;box-shadow:0 18px 48px rgba(31,58,68,.16)}
+html[data-theme=day] .settingsMenu button{color:#1F3A44}html[data-theme=day] .settingsMenu button:hover{background:rgba(31,58,68,.06)}
+html[data-theme=day] .settingsTheme select{background:#fff;color:#1F3A44;border-color:rgba(31,58,68,.18)}
+html[data-theme=day] .workName{background:#fff;color:#1F3A44;border-color:rgba(31,58,68,.18)}
+html[data-theme=unicorn]{--idea-accent:#EB5B9E;--fond:#FFF6FC;--fond2:#FFFFFF;--papier:#30253A;--trait:#E9D6E7;--muted:#7B6D85;--focus:#8E62C7;--rouge:#EB5B9E;--ocre:#79C7F2;--bleu:#8E62C7;--bleu2:#6F45AA;--vert:#74BDAA}
+html[data-theme=unicorn] body,html[data-theme=unicorn] .boardShell,html[data-theme=unicorn] .scroll{background:#FFF6FC;color:#30253A}
+html[data-theme=unicorn] .workspace{background-color:#FFF6FC;background-image:radial-gradient(rgba(142,98,199,.11) 1px,transparent 1px)}
+html[data-theme=unicorn] .top,html[data-theme=unicorn] .status{background:#FFFFFF}
+html[data-theme=unicorn] .btn,html[data-theme=unicorn] .spaceNav{background:#fff;color:#30253A;border-color:#E9D6E7}
+html[data-theme=unicorn] .ideaBtn{background:#FFF0F8;color:#30253A;border-color:var(--idea-accent)}
+html[data-theme=unicorn] .spaceBtn{color:#7B6D85}html[data-theme=unicorn] .spaceBtn.active{background:#EB5B9E;color:#fff}
+html[data-theme=unicorn] .settingsMenu,html[data-theme=unicorn] .infoBox{background:#fff;color:#30253A;border-color:#E9D6E7;box-shadow:0 18px 48px rgba(151,80,142,.16)}
+html[data-theme=unicorn] .settingsMenu button{color:#30253A}html[data-theme=unicorn] .settingsMenu button:hover{background:#FBE2F2}
+html[data-theme=unicorn] .settingsTheme select,html[data-theme=unicorn] .workName{background:#fff;color:#30253A;border-color:#E9D6E7}
+
+/* Les espaces Termes, Groupes et Idées suivent le thème actif. / Terms, Groups and Ideas follow the active theme. */
+html[data-theme=day] .listPanel,html[data-theme=day] .listPanel .listHead,html[data-theme=day] .listTools{background:#FAFAF7;color:#243033}
+html[data-theme=day] .listPanel .listHead,html[data-theme=day] .listTools{border-color:rgba(31,58,68,.16)}
+html[data-theme=day] .termItem{background:#FFFFFF;color:#243033;border-color:rgba(31,58,68,.16)}
+html[data-theme=day] .termItem.subject{background:#A63D40;color:#fff;border-color:#A63D40}
+html[data-theme=day] .termDrag{color:rgba(31,58,68,.45)}
+html[data-theme=day] .listTools select,html[data-theme=day] .groupSelect,html[data-theme=day] .ideaSelect{background-color:#fff;color:#243033;border-color:rgba(31,58,68,.20);background-image:linear-gradient(45deg,transparent 50%,#243033 50%),linear-gradient(135deg,#243033 50%,transparent 50%)}
+html[data-theme=day] .listTools .groupSelect,html[data-theme=day] .ideaSelect{border-color:var(--ocre);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ocre) 22%,transparent)}
+html[data-theme=day] .ideaPanel input,html[data-theme=day] .ideaPanel textarea{background:#fff;color:#243033;border-color:rgba(31,58,68,.18)}
+html[data-theme=day] .ideaViewer{background:#fff;color:#243033;border-color:rgba(31,58,68,.16)}
+html[data-theme=day] .ideaViewer p{color:rgba(36,48,51,.78)}
+html[data-theme=day] .groupHint{color:#243033}
+
+html[data-theme=unicorn] .listPanel,html[data-theme=unicorn] .listPanel .listHead,html[data-theme=unicorn] .listTools{background:#FFFFFF;color:#30253A}
+html[data-theme=unicorn] .listPanel .listHead,html[data-theme=unicorn] .listTools{border-color:#E9D6E7}
+html[data-theme=unicorn] .termItem{background:#FFF9FD;color:#30253A;border-color:#E9D6E7}
+html[data-theme=unicorn] .termItem.subject{background:#EB5B9E;color:#fff;border-color:#EB5B9E}
+html[data-theme=unicorn] .termDrag{color:rgba(48,37,58,.42)}
+html[data-theme=unicorn] .listTools select,html[data-theme=unicorn] .groupSelect,html[data-theme=unicorn] .ideaSelect{background-color:#fff;color:#30253A;border-color:#E9D6E7;background-image:linear-gradient(45deg,transparent 50%,#30253A 50%),linear-gradient(135deg,#30253A 50%,transparent 50%)}
+html[data-theme=unicorn] .listTools .groupSelect,html[data-theme=unicorn] .ideaSelect{border-color:var(--ocre);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ocre) 28%,transparent)}
+html[data-theme=unicorn] .ideaPanel input,html[data-theme=unicorn] .ideaPanel textarea{background:#fff;color:#30253A;border-color:#E9D6E7}
+html[data-theme=unicorn] .ideaViewer{background:#FFF9FD;color:#30253A;border-color:#E9D6E7}
+html[data-theme=unicorn] .ideaViewer p{color:#6F6078}
+html[data-theme=unicorn] .groupHint{color:#30253A}
+
+/* Zone de travail / Workspace */
+.boardShell{position:relative;min-width:0;min-height:0;background:var(--fond)}
+.boardTop{
+  position:absolute;
+  left:12px;
+  right:12px;
+  top:12px;
+  z-index:25;
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  pointer-events:none;
+}
+.boardTop>div{display:flex;gap:8px;pointer-events:auto}
+.mapViewControls{display:flex;gap:8px;align-items:center}
+.mapToolBtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.scroll{
+  position:absolute;
+  inset:0;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+  touch-action:none;
+  background:var(--fond);
+  cursor:grab;
+}
+.scroll.dragging{cursor:grabbing}
+.workspace{
+  position:relative;
+  width:7200px;
+  height:5200px;
+  transform-origin:0 0;
+  background-color:var(--fond);
+  background-image:radial-gradient(rgba(250,250,247,.075) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+.links{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:1}
+.links path{fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:.76}
+.links path.sprouting{stroke-dasharray:1;stroke-dashoffset:1;animation:branchGrow .52s cubic-bezier(.22,.75,.28,1) forwards;animation-delay:var(--branch-delay,0s)}
+@keyframes branchGrow{to{stroke-dashoffset:0}}
+.nodes{position:absolute;inset:0;z-index:2}
+
+/* Cellules / Nodes */
+.node{
+  position:absolute;
+  width:184px;
+  min-height:62px;
+  transform:translate(-50%,-50%) scale(.96);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:15px;
+  background:var(--node-bg,#E8DED0);
+  color:#20343B;
+  border:1px solid rgba(250,250,247,.14);
+  box-shadow:0 14px 28px rgba(0,0,0,.24);
+  padding:7px 10px;
+  opacity:0;
+  transition:opacity .2s ease,transform .2s ease,box-shadow .2s ease;
+}
+.node.visible{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.node.growing{opacity:0;transform:translate(-50%,-50%) scale(.72);animation:cellGrow .38s cubic-bezier(.18,.82,.25,1.12) forwards;animation-delay:var(--grow-delay,.34s)}
+@keyframes cellGrow{0%{opacity:0;transform:translate(-50%,-50%) scale(.72)}65%{opacity:1;transform:translate(-50%,-50%) scale(1.035)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.node.central{width:218px;min-height:92px;border-radius:22px;background:var(--rouge);color:#fff}
+.node.level1{background:#D7B06A}
+.node.level2{background:#9FC3CF}
+.node.level3{background:#AFC8A9;min-height:54px;width:168px}
+.node.level4{background:#D5DEC9;min-height:38px;width:118px;border-radius:11px;padding:4px 6px;box-shadow:0 8px 18px rgba(0,0,0,.18)}
+.node textarea{
+  width:100%;
+  min-height:34px;
+  max-height:76px;
+  resize:none;
+  overflow:hidden;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:inherit;
+  text-align:center;
+  font:850 15.5px/1.12 Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.node.central textarea{font-size:18px;min-height:46px;color:#fff}
+.node.level3 textarea{font-size:14px;min-height:30px}
+.node.level4 textarea{font-size:10.5px;line-height:1.05;min-height:22px;max-height:46px;font-weight:800}
+.node textarea::placeholder{color:currentColor;opacity:.42}
+.node.working{
+  outline:2px solid rgba(159,195,207,.82);
+  outline-offset:4px;
+  box-shadow:0 0 0 6px rgba(159,195,207,.09),0 16px 30px rgba(0,0,0,.28);
+  z-index:15;
+}
+.node textarea{touch-action:manipulation}
+
+/* Termes / Terms — second espace de travail, jamais en panneau latéral / second workspace, never a side panel */
+.listPanel{
+  position:absolute;
+  inset:0;
+  z-index:60;
+  display:none;
+  grid-template-rows:auto auto 1fr;
+  background:var(--fond);
+}
+.listPanel.open{display:grid}
+.listPanel .listHead{background:#20343B}
+.listHead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px;border-bottom:1px solid var(--trait)}
+.listHead h2{margin:0;font-size:15px;letter-spacing:.08em;text-transform:uppercase}
+.listHeadActions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.listTools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 14px;background:#1B2D35;border-bottom:1px solid var(--trait)}
+.listTools .btn.active{background:var(--rouge);border-color:var(--rouge)}
+.listTools select,.groupSelect,.ideaSelect{
+  min-height:38px;
+  border-radius:12px;
+  border:1px solid rgba(250,250,247,.18);
+  background-color:#20343B;
+  color:var(--papier);
+  padding:0 42px 0 12px;
+  font-size:12px;
+  font-weight:850;
+  appearance:none;
+  -webkit-appearance:none;
+  background-image:linear-gradient(45deg,transparent 50%,#FAFAF7 50%),linear-gradient(135deg,#FAFAF7 50%,transparent 50%);
+  background-position:calc(100% - 18px) 16px,calc(100% - 12px) 16px;
+  background-size:6px 6px,6px 6px;
+  background-repeat:no-repeat;
+}
+.listTools select:focus,.ideaSelect:focus{outline:0;border-color:rgba(250,250,247,.34);box-shadow:0 0 0 3px rgba(250,250,247,.06)}
+.listTools .groupSelect{min-width:190px;max-width:280px;border-color:var(--ocre);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ocre) 22%,transparent)}
+.listTools .groupSelect:focus{outline:0;border-color:var(--ocre);box-shadow:0 0 0 3px color-mix(in srgb,var(--ocre) 20%,transparent)}
+.ideaSelect{border-color:var(--ocre);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ocre) 22%,transparent)}
+.ideaSelect:focus{outline:0;border-color:var(--ocre);box-shadow:0 0 0 3px color-mix(in srgb,var(--ocre) 20%,transparent)}
+.deleteGroupBtn{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;text-align:center;line-height:1.1}
+.workName{min-height:36px;width:180px;border-radius:999px;border:1px solid rgba(250,250,247,.18);background:#20343B;color:var(--papier);padding:0 12px;font-size:12px;font-weight:800;outline:0}
+.workName::placeholder{color:rgba(250,250,247,.45)}
+.listBody{overflow:auto;padding:12px 14px 22px;touch-action:pan-y}
+.listEmpty{color:var(--muted);font-size:13px;line-height:1.45;padding:10px}
+.termList{margin:0;padding:0;list-style:none;display:grid;gap:7px;max-width:900px}
+/* Vue simple : les termes deviennent une matière brute, sans cellules. / Simple view: terms become raw material, without cards. */
+.termFlow{max-width:1100px;display:flex;flex-wrap:wrap;align-items:baseline;gap:12px 34px;padding:8px 2px 22px}
+.termFlowWord{appearance:none;border:0;background:transparent;color:var(--papier);padding:2px 0;font:800 15px/1.25 Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;cursor:default;text-align:left}
+.termFlowWord.subject{color:var(--rouge);font-weight:950}
+.termFlowWord.selectable{cursor:pointer}
+.termFlowWord.selectable:hover{color:var(--ocre)}
+.termFlowWord.selected{color:var(--ocre);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
+.termFlowWord.is-hidden{opacity:.42;text-decoration:line-through}
+html[data-theme=day] .termFlowWord{color:#243033}
+html[data-theme=day] .termFlowWord.subject{color:#A63D40}
+html[data-theme=day] .termFlowWord.selected{color:#C47A2C}
+html[data-theme=unicorn] .termFlowWord{color:#30253A}
+html[data-theme=unicorn] .termFlowWord.subject{color:#EB5B9E}
+html[data-theme=unicorn] .termFlowWord.selected{color:#8E62C7}
+.termItem{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-height:44px;
+  padding:7px 10px;
+  border-radius:13px;
+  background:#16272D;
+  border:1px solid var(--trait);
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:pan-y;
+  cursor:default;
+}
+.termItem.dragging{opacity:.62;transform:scale(.985);cursor:grabbing;box-shadow:0 12px 30px rgba(0,0,0,.30);z-index:3}
+.termItem.drag-over{outline:2px solid rgba(159,195,207,.72);outline-offset:2px}
+.termItem.subject{background:var(--rouge);border-color:var(--rouge);color:#fff;font-weight:900}
+.termCheck{width:18px;height:18px;flex:0 0 auto;accent-color:var(--ocre)}
+.termText{font-size:14px;font-weight:800;overflow-wrap:anywhere;line-height:1.2}
+.termDrag{margin-left:auto;color:rgba(250,250,247,.42);font-size:18px;font-weight:900;letter-spacing:-.12em;padding:8px 7px;cursor:grab;touch-action:none}
+.termItem.subject .termDrag{color:rgba(255,255,255,.55)}
+.termHide{margin-left:6px;width:30px;min-width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:999px;background:transparent;color:inherit;opacity:.58;font-size:15px}
+.termHide:hover{opacity:1;background:rgba(255,255,255,.08)}
+.termItem.is-hidden{opacity:.46;border-style:dashed}
+html[data-theme=day] .termHide:hover,html[data-theme=unicorn] .termHide:hover{background:rgba(31,58,68,.06)}
+.groupHint{max-width:900px;margin:0 0 10px;padding:9px 11px;border-radius:12px;border:1px solid color-mix(in srgb,var(--ocre) 42%,transparent);background:color-mix(in srgb,var(--ocre) 12%,transparent);color:var(--papier);font-size:12px;line-height:1.4}
+.ideaPanel{max-width:760px;display:grid;gap:10px}
+.ideaPanel label{font-size:10px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.ideaPanel input,.ideaPanel textarea{width:100%;border:1px solid var(--trait);background:#20343B;color:var(--papier);border-radius:13px;padding:10px 12px;outline:0}
+.ideaSelect{width:100%}
+.ideaPanel textarea{min-height:220px;resize:vertical;line-height:1.45}
+.ideaActions{display:flex;gap:8px;flex-wrap:wrap}
+.ideaViewer{max-width:760px;margin-top:12px;padding:14px;border-radius:16px;background:#1B2D35;border:1px solid var(--trait)}
+.ideaViewer h3{margin:0 0 9px;font-size:18px}
+.ideaViewer p{margin:0;white-space:pre-wrap;color:rgba(250,250,247,.78);font-size:14px;line-height:1.55}
+.ideaEmpty{color:var(--muted);font-size:13px}
+
+.status{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.eigrutel-app-footer{width:100%;padding:12px 16px 10px;text-align:center;box-sizing:border-box;background:var(--fond2);border-top:1px solid var(--trait)}
+.eigrutel-app-footer a{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--papier);text-decoration:none;opacity:.72}
+.eigrutel-app-footer a:hover{opacity:1}
+html[data-theme=day] .eigrutel-app-footer{background:#FAFAF7;border-color:rgba(31,58,68,.10)}
+html[data-theme=day] .eigrutel-app-footer a{color:#1F3A44}
+html[data-theme=unicorn] .eigrutel-app-footer{background:#FFFFFF;border-color:#E9D6E7}
+html[data-theme=unicorn] .eigrutel-app-footer a{color:#8E62C7}
+
+@media(max-width:760px){
+  .app{height:100dvh}
+  .top{padding:8px 10px;gap:6px;overflow:visible}
+  .actions{width:100%;display:flex;justify-content:flex-start;align-items:center;gap:7px;flex-wrap:wrap;min-width:0}
+  .spaceNav{order:-2;width:100%;justify-content:stretch;flex:0 0 100%}
+  .spaceBtn{flex:1;min-width:0;padding:0 8px}
+  .ideaBtn{order:-1;min-height:38px;padding:0 13px;flex:0 0 auto}
+  .ideaBtn .ideaSpark{font-size:19px}
+  .workName{flex:1 1 130px;width:auto;min-width:110px;max-width:none}
+  .historyBtns{flex:0 0 auto}
+  .historyBtn,.settingsBtn{width:38px;min-width:38px;height:38px}
+  .settingsWrap{margin-left:auto;position:static}
+  .settingsMenu{position:fixed;top:104px;right:10px;left:auto;width:min(280px,calc(100vw - 20px));max-height:calc(100dvh - 118px);overflow:auto;z-index:140}
+  .btn{min-height:34px;padding:0 10px}
+  .boardTop{top:8px;right:8px;left:8px}
+  .mapViewControls{gap:6px;margin-left:auto}
+  .listHead{align-items:flex-start;padding:11px 10px}
+  .listHeadActions{justify-content:flex-end}
+  .listTools{padding:8px 10px;gap:7px;align-items:stretch}
+  .listTools select,.listTools .groupSelect{flex:1 1 180px;max-width:none;min-width:0;width:100%}
+  .listTools .btn{flex:0 1 auto}
+  .listBody{padding:10px 10px 18px}
+  .termList,.groupHint{max-width:none}
+  .termItem{min-height:46px;padding:7px 8px;gap:8px}
+  .termText{font-size:13px}
+  .ideaPanel,.ideaViewer{max-width:none}
+  .ideaPanel textarea{min-height:42dvh}
+  .status{font-size:10px;padding:5px 8px}
+  .workspace{width:6200px;height:4800px}
+  .node{width:168px;min-height:58px}
+  .node.central{width:196px;min-height:84px}
+  .node.level3{width:154px;min-height:50px}
+  .node.level4{width:108px;min-height:36px}
+  .infoModal{padding:10px;align-items:flex-end}
+  .infoBox{width:100%;max-height:88dvh;border-radius:20px 20px 0 0;padding:16px}
+}
+@media(max-width:430px){
+  /* Mobile : priorité à la zone de travail, pas aux commandes. / Mobile: prioritize the workspace over controls. */
+  .top{padding:6px 7px;gap:5px}
+  .actions{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:5px;width:100%;align-items:center}
+
+  /* 1 — Navigation / Navigation */
+  .spaceNav{grid-column:1 / -1;order:0;width:100%;min-height:38px;padding:2px}
+  .spaceBtn{min-height:34px;font-size:11.5px;padding:0 6px}
+
+  /* 2 — Action principale / Primary action */
+  .ideaBtn{grid-column:1 / -1;order:0;width:100%;min-height:38px;height:38px;justify-content:center;padding:0 12px}
+  .ideaBtn .ideaSpark{font-size:18px}
+
+  /* 3 — Nom + historique + menu sur une seule ligne. / Name + history + menu on a single row. */
+  .workName{grid-column:1;order:0;width:100%;min-width:0;min-height:36px;height:36px}
+  .historyBtns{grid-column:2;order:0;gap:4px}
+  .historyBtn,.settingsBtn{width:36px;min-width:36px;height:36px}
+  .settingsWrap{grid-column:3;order:0;margin:0;position:static}
+  .settingsMenu{top:132px;right:7px;width:calc(100vw - 14px);max-height:calc(100dvh - 144px)}
+
+  /* Dans Termes, le titre est déjà donné par l’onglet supérieur. / In Terms, the top tab already provides the title. */
+  .listPanel{grid-template-rows:auto 1fr}
+  .listHead{display:none}
+
+  /* Barre d’outils compacte : deux lignes seulement. / Compact toolbar: two rows only. */
+  .listTools{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
+    gap:5px;
+    padding:6px 7px;
+    align-items:center;
+  }
+  .listTools select,.listTools .groupSelect{
+    min-height:34px;
+    height:34px;
+    width:100%;
+    min-width:0;
+    max-width:none;
+    padding:0 28px 0 9px;
+    font-size:10.5px;
+    background-position:calc(100% - 14px) 14px,calc(100% - 9px) 14px;
+    background-size:5px 5px,5px 5px;
+  }
+  .listTools [data-sort]{grid-column:1 / span 1}
+  .listTools .groupSelect{grid-column:2 / span 2}
+  .listTools .btn{
+    width:100%;
+    min-width:0;
+    min-height:32px;
+    height:32px;
+    padding:0 6px;
+    font-size:10.5px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .listTools [data-new-group]{grid-column:1}
+  .listTools [data-global-list]{grid-column:2}
+  .listTools [data-toggle-hidden]{grid-column:3}
+  .listTools [data-term-view]{grid-column:1 / -1}
+  .listTools [data-delete-group]{grid-column:1 / -1;height:32px}
+
+  /* La liste devient l’élément dominant de l’écran. / The term list becomes the dominant screen area. */
+  .listBody{padding:7px 7px 14px;overscroll-behavior:contain}
+  .termList{gap:5px}
+  .termFlow{gap:10px 24px;padding:8px 4px 18px}
+  .termFlowWord{font-size:13px}
+  .termItem{min-height:40px;padding:5px 7px;gap:7px;border-radius:11px}
+  .termText{font-size:12.5px;line-height:1.15}
+  .termCheck{width:16px;height:16px}
+  .termHide{width:26px;min-width:26px;height:26px;font-size:13px}
+  .termDrag{padding:5px 4px;font-size:16px}
+  .groupHint{margin:0 0 6px;padding:7px 8px;font-size:10.5px}
+
+  .boardTop{top:6px}
+  .eigrutel-app-footer{padding:9px 10px 8px}
+  .eigrutel-app-footer a{font-size:11px;letter-spacing:.10em}
+}
+</style>
+</head>
+<body>
+<!-- Application principale / Main application -->
+<div class="app">
+  <header class="top">
+    <div class="actions">
+      <nav class="spaceNav" aria-label="Espaces de travail">
+        <button class="spaceBtn active" type="button" data-space-map>Mindmap</button>
+        <button class="spaceBtn" type="button" data-space-list>Termes</button>
+        <button class="spaceBtn" type="button" data-space-ideas>Idées</button>
+      </nav>
+      <button class="btn ideaBtn" type="button" data-new-idea aria-label="Nouvelle idée" title="Nouvelle idée"><span class="ideaSpark" aria-hidden="true">✦</span><span>Nouvelle idée</span></button>
+      <input class="workName" type="text" data-work-name placeholder="Nom du travail" aria-label="Nom du travail">
+      <div class="historyBtns">
+        <button class="btn historyBtn" type="button" data-undo disabled title="Annuler la dernière action" aria-label="Annuler la dernière action"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7H5V3"/><path d="M5 7c2.4-2.8 6.1-4.5 10.2-4 4.8.6 8.3 4.6 8.3 9.5 0 5.3-4.3 9.5-9.5 9.5-4 0-7.5-2.5-8.9-6.1"/></svg></button>
+        <button class="btn historyBtn" type="button" data-redo disabled title="Rétablir l’action annulée" aria-label="Rétablir l’action annulée"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 7h4V3"/><path d="M19 7c-2.4-2.8-6.1-4.5-10.2-4-4.8.6-8.3 4.6-8.3 9.5 0 5.3 4.3 9.5 9.5 9.5 4 0 7.5-2.5 8.9-6.1"/></svg></button>
+      </div>
+      <div class="settingsWrap">
+        <button class="btn icon settingsBtn" type="button" data-settings-toggle aria-expanded="false" aria-label="Réglages" title="Réglages"><span></span><span></span><span></span></button>
+        <div class="settingsMenu" data-settings-menu>
+          <button type="button" data-info>Manuel</button>
+          <hr>
+          <button type="button" data-export-json>Sauvegarder le projet</button>
+          <button type="button" data-import-json>Ouvrir un projet</button>
+          <input type="file" accept="application/json,.json" data-import-file hidden>
+          <button type="button" data-print-terms>Imprimer les termes</button>
+          <button type="button" data-print-ideas>Imprimer les idées</button>
+          <hr>
+          <div class="settingsTheme"><span>FR / EN</span><select data-language-select aria-label="Langue / Language"><option value="fr">FR</option><option value="en">EN</option></select></div>
+          <div class="settingsTheme"><span>Style</span><select data-theme-select aria-label="Style"><option value="day">Jour</option><option value="night">Nocturne</option><option value="unicorn">Licorne</option></select></div>
+          <hr>
+          <button type="button" data-reset>Réinitialiser</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="boardShell">
+    <div class="boardTop">
+      <div></div>
+      <div class="mapViewControls" aria-label="Navigation de la carte">
+        <button class="btn icon" type="button" data-zoom-out aria-label="Dézoomer" title="Dézoomer">−</button>
+        <button class="btn icon" type="button" data-zoom-in aria-label="Zoomer" title="Zoomer">+</button>
+        <button class="btn icon mapToolBtn" type="button" data-fit aria-label="Vue entière" title="Vue entière">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"/><path d="M3 8l5-5M16 3l5 5M21 16l-5 5M8 21l-5-5"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="scroll" data-scroll>
+      <div class="workspace" data-workspace>
+        <svg class="links" data-links></svg>
+        <div class="nodes" data-nodes></div>
+      </div>
+    </div>
+
+    <aside class="listPanel" data-list-panel aria-hidden="true">
+      <div class="listHead">
+        <h2 data-list-title>Termes</h2>
+        <div class="listHeadActions" data-list-head-actions></div>
+      </div>
+      <div class="listTools" data-list-tools>
+        <select data-sort aria-label="Trier les termes">
+          <option value="manual">Ordre manuel</option>
+          <option value="az">A → Z</option>
+          <option value="za">Z → A</option>
+          <option value="long">Plus long → plus court</option>
+          <option value="short">Plus court → plus long</option>
+        </select>
+        <button class="btn" type="button" data-new-group>Grouper</button>
+        <select class="groupSelect" data-group-select aria-label="Groupes">
+          <option value="">Liste globale</option>
+        </select>
+        <button class="btn" type="button" data-global-list>Liste globale</button>
+        <button class="btn danger deleteGroupBtn" type="button" data-delete-group style="display:none">Supprimer le groupe</button>
+        <button class="btn" type="button" data-toggle-hidden>Afficher les masqués</button>
+        <button class="btn" type="button" data-term-view>Vue simple</button>
+      </div>
+      <div class="listBody" data-list-body></div>
+    </aside>
+  </main>
+
+  <p class="status" data-status aria-live="polite">Saisir le sujet central pour ouvrir la carte.</p>
+  <footer class="eigrutel-app-footer">
+    <a href="https://www.stripmee.com" target="_blank" rel="noopener noreferrer">Eigrutel BD Academy</a>
+  </footer>
+</div>
+<!-- Manuel / Manual -->
+<div class="infoModal" data-info-modal aria-hidden="true"><div class="infoBox"><div class="infoHead"><h2 data-manual-title>Manuel</h2><button class="btn icon" type="button" data-info-close aria-label="Fermer">×</button></div>
+<p><strong>Pop!</strong> sert à provoquer des rapprochements inattendus par associations successives. Le principe important est de ne pas chercher trop tôt une bonne idée.</p>
+<ol>
+<li><strong>Commencer par le sujet.</strong> Inscrire le sujet de la recherche dans la cellule centrale.</li>
+<li><strong>Ouvrir le premier niveau.</strong> Dans les cellules qui entourent le sujet, inscrire librement un terme par branche. Chercher sans filtrer : contraires, analogies, personnalités, événements, objets, lieux, souvenirs, expressions, sensations… Tout rapprochement est permis.</li>
+<li><strong>Oublier le sujet central.</strong> Pour développer une branche, ne plus chercher un rapport avec le sujet de départ. Partir uniquement du terme de la cellule précédente et inscrire, dans chacune de ses cellules filles, un nouveau terme obtenu par libre association.</li>
+<li><strong>Continuer de proche en proche.</strong> Répéter exactement le même principe aux niveaux suivants : chaque cellule devient momentanément le seul point de départ. Éviter de revenir mentalement au sujet central.</li>
+<li><strong>Passer à Termes.</strong> Cet espace récupère en brut tout ce qui a été inscrit dans la carte. Trier, masquer ce qui paraît inutile, déplacer ou grouper les termes si cela aide à les regarder autrement.</li>
+<li><strong>Faire les rapprochements.</strong> Choisir quelques termes, y compris des termes éloignés les uns des autres, puis essayer de les raccrocher d’une manière ou d’une autre au sujet central. C’est généralement à ce moment que les idées commencent à apparaître.</li>
+<li><strong>Noter les idées.</strong> Utiliser <strong>✦ Nouvelle idée</strong> dès qu’une piste apparaît. La noter même si elle semble improbable, excessive ou farfelue. Le tri viendra plus tard : à ce stade, l’objectif est de produire des possibilités.</li>
+</ol>
+<p><strong>Principe général :</strong> pendant la mindmap, associer sans juger ; dans Termes, recombiner ; dans Idées, conserver ce qui surgit.</p>
+</div></div>
+
+<script>
+(function(){
+'use strict';
+
+// ==========================================================
+// CONSTANTES ET ÉTAT / CONSTANTS AND STATE
+// ==========================================================
+// Clé historique conservée pour ne pas perdre les travaux locaux créés avant le renommage en Pop!.
+// Legacy key retained so local work created before the Pop! rename remains available.
+const STORAGE_KEY='eigrutel_creamap_proto_v1';
+const BOARD_W=7200, BOARD_H=5200;
+const CENTER={x:3600,y:2600};
+const MIN_Z=.28, MAX_Z=1.35;
+const LEVEL_COLORS={1:'#C47A2C',2:'#9FC3CF',3:'#8B8E5A'};
+
+// Couleur des branches N4 : les trois enfants d’une même cellule N3 partagent la même teinte.
+// N4 branch color: the three children of one N3 cell share the same hue.
+// Chaque parent N3 reçoit une couleur distincte et stable calculée depuis son identifiant.
+// Each N3 parent receives a distinct, stable color computed from its identifier.
+function level4GroupColor(node){
+  const parent=parentOf(node);
+  if(!parent||parent.level!==3)return '#AFC8A9';
+  const m=parent.id.match(/^n3-(\d+)-(\d+)-(\d+)$/);
+  if(!m)return '#AFC8A9';
+  const i=Number(m[1])-1,j=Number(m[2])-1,k=Number(m[3])-1;
+  const index=i*9+j*3+k;
+  const hue=(18+index*137.508)%360;
+  return `hsl(${hue.toFixed(1)} 46% 62%)`;
+}
+
+function branchColor(node){
+  return node.level===4?level4GroupColor(node):(LEVEL_COLORS[node.level]||'#FAFAF7');
+}
+const E={
+  scroll:document.querySelector('[data-scroll]'),
+  workspace:document.querySelector('[data-workspace]'),
+  links:document.querySelector('[data-links]'),
+  nodes:document.querySelector('[data-nodes]'),
+  status:document.querySelector('[data-status]'),
+  listPanel:document.querySelector('[data-list-panel]'),
+  listBody:document.querySelector('[data-list-body]'),
+  listTitle:document.querySelector('[data-list-title]'),
+  listTools:document.querySelector('[data-list-tools]'),
+  sort:document.querySelector('[data-sort]'),
+  groupSelect:document.querySelector('[data-group-select]'),
+  deleteGroup:document.querySelector('[data-delete-group]'),
+  workName:document.querySelector('[data-work-name]'),
+  spaceMap:document.querySelector('[data-space-map]'),
+  spaceList:document.querySelector('[data-space-list]'),
+  spaceIdeas:document.querySelector('[data-space-ideas]'),
+  undo:document.querySelector('[data-undo]'),
+  redo:document.querySelector('[data-redo]'),
+  settingsToggle:document.querySelector('[data-settings-toggle]'),
+  settingsMenu:document.querySelector('[data-settings-menu]'),
+  importFile:document.querySelector('[data-import-file]'),
+  themeSelect:document.querySelector('[data-theme-select]'),
+  languageSelect:document.querySelector('[data-language-select]'),
+  infoModal:document.querySelector('[data-info-modal]')
+};
+let S={zoom:.72,activeId:null,space:'map',listOpen:false,listView:'terms',sort:'manual',listOrder:[],groups:[],activeGroupId:null,selectedTermIds:[],hiddenTermIds:[],showHiddenTerms:false,termDisplay:'flow',ideas:[],activeIdeaId:null,workName:'',ideaReturnSpace:null,theme:'night',lang:'fr'};
+let revealedBefore=new Set();
+let HISTORY={undo:[],redo:[],last:null,lastPush:0,restoring:false};
+
+function makeNode(id,level,parentId,index){
+  return {id,level,parentId,index,text:'',committed:false,children:[]};
+}
+const root=makeNode('root',0,null,0);
+
+function buildTree(){
+  root.children=[];
+  for(let i=0;i<5;i++){
+    const n1=makeNode(`n1-${i+1}`,1,'root',i);
+    for(let j=0;j<3;j++){
+      const n2=makeNode(`n2-${i+1}-${j+1}`,2,n1.id,j);
+      for(let k=0;k<3;k++){
+        const n3=makeNode(`n3-${i+1}-${j+1}-${k+1}`,3,n2.id,k);
+        for(let l=0;l<3;l++) n3.children.push(makeNode(`n4-${i+1}-${j+1}-${k+1}-${l+1}`,4,n3.id,l));
+        n2.children.push(n3);
+      }
+      n1.children.push(n2);
+    }
+    root.children.push(n1);
+  }
+}
+buildTree();
+
+function walk(node,fn){fn(node);node.children.forEach(c=>walk(c,fn))}
+function byId(id){let found=null;walk(root,n=>{if(n.id===id)found=n});return found}
+function hasText(node){return !!node.text.trim()}
+function parentOf(node){return node.parentId?byId(node.parentId):null}
+function ancestors(node){const a=[];let p=parentOf(node);while(p){a.push(p);p=parentOf(p)}return a}
+function descendants(node){const out=[];node.children.forEach(c=>walk(c,n=>out.push(n)));return out}
+
+// Un enfant n’apparaît qu’après validation du terme de son parent.
+// A child appears only after its parent term has been committed.
+// Validation : touche Entrée ou sortie du champ. / Commit: Enter key or field blur.
+function isRevealed(node){
+  if(node.id==='root')return true;
+  const p=parentOf(node);
+  return !!p && p.committed && isRevealed(p);
+}
+function clearBranchBelow(node){
+  descendants(node).forEach(child=>{child.text='';child.committed=false});
+}
+function commitNode(node,previousText=''){
+  const next=hasText(node);
+
+  // Modifier ou corriger un terme ne touche jamais à sa branche. / Editing a term never alters its branch.
+  // La branche n’est supprimée que si le terme est vidé puis validé. / The branch is removed only when the term is cleared and committed.
+  if(!next && node.committed){
+    const filledDescendants=descendants(node).filter(hasText);
+    if(filledDescendants.length){
+      const ok=confirm(tr('deleteBranch'));
+      if(!ok){
+        node.text=String(previousText||'');
+        node.committed=!!node.text.trim();
+        render();
+        save();
+        return 'cancelled';
+      }
+      clearBranchBelow(node);
+    }
+  }
+
+  if(node.committed===next){
+    save();
+    renderList();
+    return false;
+  }
+  node.committed=next;
+  save();
+  render();
+  return true;
+}
+
+
+// ==========================================================
+// INTERFACE BILINGUE / BILINGUAL INTERFACE
+// ==========================================================
+const MANUAL_FR=`<p><strong>Pop!</strong> sert à provoquer des rapprochements inattendus par associations successives. Le principe important est de ne pas chercher trop tôt une bonne idée.</p>
+<ol>
+<li><strong>Commencer par le sujet.</strong> Inscrire le sujet de la recherche dans la cellule centrale.</li>
+<li><strong>Ouvrir le premier niveau.</strong> Dans les cellules qui entourent le sujet, inscrire librement un terme par branche. Chercher sans filtrer : contraires, analogies, personnalités, événements, objets, lieux, souvenirs, expressions, sensations… Tout rapprochement est permis.</li>
+<li><strong>Oublier le sujet central.</strong> Pour développer une branche, ne plus chercher un rapport avec le sujet de départ. Partir uniquement du terme de la cellule précédente et inscrire, dans chacune de ses cellules filles, un nouveau terme obtenu par libre association.</li>
+<li><strong>Continuer de proche en proche.</strong> Répéter exactement le même principe aux niveaux suivants : chaque cellule devient momentanément le seul point de départ. Éviter de revenir mentalement au sujet central.</li>
+<li><strong>Passer à Termes.</strong> Cet espace récupère en brut tout ce qui a été inscrit dans la carte. Trier, masquer ce qui paraît inutile, déplacer ou grouper les termes si cela aide à les regarder autrement.</li>
+<li><strong>Faire les rapprochements.</strong> Choisir quelques termes, y compris des termes éloignés les uns des autres, puis essayer de les raccrocher d’une manière ou d’une autre au sujet central. C’est généralement à ce moment que les idées commencent à apparaître.</li>
+<li><strong>Noter les idées.</strong> Utiliser <strong>✦ Nouvelle idée</strong> dès qu’une piste apparaît. La noter même si elle semble improbable, excessive ou farfelue. Le tri viendra plus tard : à ce stade, l’objectif est de produire des possibilités.</li>
+</ol>
+<p><strong>Principe général :</strong> pendant la mindmap, associer sans juger ; dans Termes, recombiner ; dans Idées, conserver ce qui surgit.</p>`;
+const MANUAL_EN=`<p><strong>Pop!</strong> is designed to trigger unexpected connections through successive free associations. The key principle is not to look for a good idea too early.</p>
+<ol>
+<li><strong>Start with the subject.</strong> Enter the subject of your research in the central cell.</li>
+<li><strong>Open the first level.</strong> In the cells around the subject, freely enter one term per branch. Do not filter: opposites, analogies, people, events, objects, places, memories, expressions, sensations… Any connection is valid.</li>
+<li><strong>Forget the central subject.</strong> To develop a branch, stop looking for a link with the starting subject. Use only the term in the previous cell as your new starting point, and enter one freely associated term in each of its child cells.</li>
+<li><strong>Continue step by step.</strong> Repeat the same principle on the following levels: each cell temporarily becomes the only starting point. Avoid mentally returning to the central subject.</li>
+<li><strong>Go to Terms.</strong> This space collects the raw content entered in the map. Sort it, hide what seems unhelpful, move terms around or group them if that helps you see them differently.</li>
+<li><strong>Make connections.</strong> Pick a few terms, including terms that seem far apart, and try to connect them in some way to the central subject. This is usually when ideas begin to appear.</li>
+<li><strong>Write the ideas down.</strong> Use <strong>✦ New idea</strong> as soon as a direction appears. Record it even if it seems unlikely, excessive or absurd. Selection comes later: at this stage, the goal is to generate possibilities.</li>
+</ol>
+<p><strong>General principle:</strong> in the mindmap, associate without judging; in Terms, recombine; in Ideas, keep what emerges.</p>`;
+const T={
+ fr:{terms:'Termes',ideas:'Idées',newIdea:'Nouvelle idée',workName:'Nom du travail',settings:'Réglages',manual:'Manuel',saveJson:'Sauvegarder le projet',loadJson:'Ouvrir un projet',printTerms:'Imprimer les termes',printIdeas:'Imprimer les idées',style:'Style',day:'Jour',night:'Nocturne',unicorn:'Licorne',reset:'Réinitialiser',zoomOut:'Dézoomer',zoomIn:'Zoomer',fit:'Vue entière',sort:'Trier les termes',manualOrder:'Ordre manuel',long:'Plus long → plus court',short:'Plus court → plus long',group:'Grouper',global:'Liste globale',deleteGroup:'Supprimer le groupe',showHidden:'Afficher les masqués',hideHidden:'Masquer les masqués',simpleView:'Vue simple',listViewMode:'Vue liste',central:'Sujet central',level:'Niveau',selectGroup:'Sélectionner',noGroupTerms:'Aucun terme dans ce groupe.',noTerms:'Aucun terme pour le moment.',groupLabel:'Groupe',rehide:'Réafficher ce terme',hide:'Masquer ce terme',selectFirst:'Sélectionner d’abord les termes à grouper.',groupName:'Nom du groupe :',groupDeleted:'Groupe supprimé.',editIdea:'Modifier une idée',ideaTitle:'Titre',ideaTitlePh:'Titre de l’idée',ideaLabel:'Idée',ideaPh:'Écrire l’idée…',save:'Enregistrer',cancel:'Annuler',createdIdeas:'Idées créées',noIdeas:'Aucune idée enregistrée.',untitled:'Sans titre',edit:'Modifier',deleteIdea:'Supprimer l’idée',deleteIdeaQ:'Supprimer cette idée ?',mapStatus:'Mindmap.',termsStatus:'Termes et groupes.',ideasStatus:'Idées.',undoDone:'Action annulée.',redoDone:'Action rétablie.',resetQ:'Réinitialiser toute la mindmap ?',start:'Saisir le sujet central pour ouvrir la carte.',needName:'Donner un nom au travail avant de sauvegarder le projet.',saved:'sauvegardé.',globalStatus:'Liste globale.',printPopup:'Impossible d’ouvrir la fenêtre d’impression. Autoriser les fenêtres surgissantes.',noPrintTerms:'Aucun terme à imprimer.',subject:'Sujet',noOther:'Aucun autre terme.',noPrintIdeas:'Aucune idée à imprimer.',idea:'Idée',loaded:'Projet ouvert.',badJson:'Ce fichier ne semble pas être un projet Pop! valide.',deleteBranch:'Supprimer ce terme et tous les termes associés à sa branche ?',deleteGroupQ:'Supprimer le groupe',close:'Fermer'},
+ en:{terms:'Terms',ideas:'Ideas',newIdea:'New idea',workName:'Work name',settings:'Settings',manual:'Manual',saveJson:'Save project',loadJson:'Open project',printTerms:'Print terms',printIdeas:'Print ideas',style:'Style',day:'Day',night:'Night',unicorn:'Unicorn',reset:'Reset',zoomOut:'Zoom out',zoomIn:'Zoom in',fit:'Fit map',sort:'Sort terms',manualOrder:'Manual order',long:'Longest → shortest',short:'Shortest → longest',group:'Group',global:'Global list',deleteGroup:'Delete group',showHidden:'Show hidden',hideHidden:'Hide hidden',simpleView:'Simple view',listViewMode:'List view',central:'Central subject',level:'Level',selectGroup:'Select',noGroupTerms:'No terms in this group.',noTerms:'No terms yet.',groupLabel:'Group',rehide:'Show this term again',hide:'Hide this term',selectFirst:'Select the terms to group first.',groupName:'Group name:',groupDeleted:'Group deleted.',editIdea:'Edit idea',ideaTitle:'Title',ideaTitlePh:'Idea title',ideaLabel:'Idea',ideaPh:'Write the idea…',save:'Save',cancel:'Cancel',createdIdeas:'Saved ideas',noIdeas:'No saved ideas.',untitled:'Untitled',edit:'Edit',deleteIdea:'Delete idea',deleteIdeaQ:'Delete this idea?',mapStatus:'Mindmap.',termsStatus:'Terms and groups.',ideasStatus:'Ideas.',undoDone:'Action undone.',redoDone:'Action restored.',resetQ:'Reset the entire mindmap?',start:'Enter the central subject to open the map.',needName:'Give this work a name before saving the project.',saved:'saved.',globalStatus:'Global list.',printPopup:'Unable to open the print window. Allow pop-ups.',noPrintTerms:'No terms to print.',subject:'Subject',noOther:'No other terms.',noPrintIdeas:'No ideas to print.',idea:'Idea',loaded:'Project opened.',badJson:'This file does not appear to be a valid Pop! project file.',deleteBranch:'Delete this term and all terms associated with its branch?',deleteGroupQ:'Delete group',close:'Close'}
+};
+function tr(k){return (T[S.lang||'fr']||T.fr)[k]??T.fr[k]??k}
+function setBtnText(sel,text){const el=document.querySelector(sel);if(el)el.textContent=text}
+function applyLanguage(){
+ const en=S.lang==='en';document.documentElement.lang=en?'en':'fr';if(E.languageSelect)E.languageSelect.value=S.lang||'fr';
+ E.spaceList.textContent=tr('terms');E.spaceIdeas.textContent=tr('ideas');
+ const ideaBtn=document.querySelector('[data-new-idea] span:last-child');if(ideaBtn)ideaBtn.textContent=tr('newIdea');
+ const newIdeaBtn=document.querySelector('[data-new-idea]');if(newIdeaBtn){newIdeaBtn.title=tr('newIdea');newIdeaBtn.setAttribute('aria-label',tr('newIdea'))}
+ E.workName.placeholder=tr('workName');E.workName.setAttribute('aria-label',tr('workName'));
+ E.settingsToggle.title=tr('settings');E.settingsToggle.setAttribute('aria-label',tr('settings'));
+ const ub=document.querySelector('[data-undo]'),rb=document.querySelector('[data-redo]');if(ub){ub.title=en?'Undo last action':'Annuler la dernière action';ub.setAttribute('aria-label',ub.title)}if(rb){rb.title=en?'Redo last undone action':'Rétablir l’action annulée';rb.setAttribute('aria-label',rb.title)}
+ setBtnText('[data-info]',tr('manual'));setBtnText('[data-export-json]',tr('saveJson'));setBtnText('[data-import-json]',tr('loadJson'));setBtnText('[data-print-terms]',tr('printTerms'));setBtnText('[data-print-ideas]',tr('printIdeas'));setBtnText('[data-reset]',tr('reset'));
+ const styleLabel=E.themeSelect?.closest('.settingsTheme')?.querySelector('span');if(styleLabel)styleLabel.textContent=tr('style');
+ if(E.themeSelect){const labels=[tr('day'),tr('night'),tr('unicorn')];[...E.themeSelect.options].forEach((o,i)=>o.textContent=labels[i])}
+ const zo=document.querySelector('[data-zoom-out]'),zi=document.querySelector('[data-zoom-in]'),fit=document.querySelector('[data-fit]');if(zo){zo.title=tr('zoomOut');zo.setAttribute('aria-label',tr('zoomOut'))}if(zi){zi.title=tr('zoomIn');zi.setAttribute('aria-label',tr('zoomIn'))}if(fit){fit.title=tr('fit');fit.setAttribute('aria-label',tr('fit'))}
+ E.sort.setAttribute('aria-label',tr('sort'));const opts=E.sort.options;if(opts[0])opts[0].textContent=tr('manualOrder');if(opts[3])opts[3].textContent=tr('long');if(opts[4])opts[4].textContent=tr('short');
+ setBtnText('[data-new-group]',tr('group'));setBtnText('[data-global-list]',tr('global'));setBtnText('[data-delete-group]',tr('deleteGroup'));
+ const mt=document.querySelector('[data-manual-title]');if(mt)mt.textContent=tr('manual');const close=document.querySelector('[data-info-close]');if(close)close.setAttribute('aria-label',tr('close'));
+ const box=document.querySelector('.infoBox');if(box){[...box.children].filter(x=>!x.classList.contains('infoHead')).forEach(x=>x.remove());box.insertAdjacentHTML('beforeend',en?MANUAL_EN:MANUAL_FR)}
+ render();
+}
+function setLanguage(lang){S.lang=lang==='en'?'en':'fr';applyLanguage();save()}
+
+// ==========================================================
+// GÉOMÉTRIE DE LA CARTE / MAP GEOMETRY
+// ==========================================================
+function polar(cx,cy,r,angle){const a=angle*Math.PI/180;return{x:cx+Math.cos(a)*r,y:cy+Math.sin(a)*r}}
+
+function positions(){
+  const pos={root:CENTER};
+  const bases=[-144,-72,0,72,144];
+  const level3=[];
+  const level4=[];
+
+  root.children.forEach((n1,i)=>{
+    const base=bases[i];
+    pos[n1.id]=polar(CENTER.x,CENTER.y,305,base);
+    n1.children.forEach((n2,j)=>{
+      const a2=base+(j-1)*20;
+      const p2=polar(CENTER.x,CENTER.y,615,a2);
+      pos[n2.id]=p2;
+
+      // Niveau 3 : petite grappe locale autour de son niveau 2. / Level 3: compact local cluster around its level 2 parent.
+      const aRad=a2*Math.PI/180;
+      const dir={x:Math.cos(aRad),y:Math.sin(aRad)};
+      const normal={x:-dir.y,y:dir.x};
+      const forward=255;
+      const lateral=132;
+      const radialOffsets=[-24,0,24];
+      n2.children.forEach((n3,k)=>{
+        const side=(k-1)*lateral;
+        const depth=forward+radialOffsets[k];
+        const target={
+          x:p2.x + dir.x*depth + normal.x*side,
+          y:p2.y + dir.y*depth + normal.y*side
+        };
+        pos[n3.id]={x:target.x,y:target.y};
+        level3.push({id:n3.id,targetX:target.x,targetY:target.y});
+      });
+    });
+  });
+
+  // Anti-chevauchement N3. / N3 overlap resolution.
+  relaxNodes(level3,pos,194,82,26,.08);
+
+  // Niveau 4 : trois petites cellules par N3, placées au plus près de leur parent.
+  // Level 4: three small cells per N3, placed close to their parent.
+  // Elles restent discrètes ; le zoom permet de travailler à ce niveau. / They stay compact; zoom is used for detailed work.
+  level3.forEach(item=>{
+    const n3=byId(item.id);
+    const p3=pos[item.id];
+    if(!n3||!p3)return;
+    let dx=p3.x-CENTER.x,dy=p3.y-CENTER.y;
+    const len=Math.hypot(dx,dy)||1;
+    const dir={x:dx/len,y:dy/len};
+    const normal={x:-dir.y,y:dir.x};
+    n3.children.forEach((n4,k)=>{
+      const side=(k-1)*82;
+      const depth=178+(k===1?12:0);
+      const target={
+        x:p3.x+dir.x*depth+normal.x*side,
+        y:p3.y+dir.y*depth+normal.y*side
+      };
+      pos[n4.id]={x:target.x,y:target.y};
+      level4.push({id:n4.id,targetX:target.x,targetY:target.y});
+    });
+  });
+
+  // Anti-chevauchement N4, adapté aux petites cellules. / N4 overlap resolution tuned for smaller cells.
+  relaxNodes(level4,pos,132,58,34,.055);
+  return pos;
+}
+
+function relaxNodes(items,pos,spacingX,spacingY,iterations,pull){
+  const margin=80;
+  for(let iter=0;iter<iterations;iter++){
+    items.forEach(item=>{
+      const p=pos[item.id];
+      p.x+=(item.targetX-p.x)*pull;
+      p.y+=(item.targetY-p.y)*pull;
+    });
+    for(let a=0;a<items.length;a++){
+      for(let b=a+1;b<items.length;b++){
+        const pa=pos[items[a].id],pb=pos[items[b].id];
+        let dx=pb.x-pa.x,dy=pb.y-pa.y;
+        if(dx===0&&dy===0){dx=.01;dy=.01}
+        const overlapX=spacingX-Math.abs(dx);
+        const overlapY=spacingY-Math.abs(dy);
+        if(overlapX>0&&overlapY>0){
+          if(overlapX<overlapY){
+            const push=overlapX/2+1.5,sign=dx<0?-1:1;
+            pa.x-=push*sign;pb.x+=push*sign;
+          }else{
+            const push=overlapY/2+1.5,sign=dy<0?-1:1;
+            pa.y-=push*sign;pb.y+=push*sign;
+          }
+        }
+      }
+    }
+    items.forEach(item=>{
+      const p=pos[item.id];
+      p.x=Math.max(margin,Math.min(BOARD_W-margin,p.x));
+      p.y=Math.max(margin,Math.min(BOARD_H-margin,p.y));
+    });
+  }
+}
+
+function linkPath(a,b){
+  const dx=(b.x-a.x)*.48;
+  return `M ${a.x} ${a.y} C ${a.x+dx} ${a.y}, ${b.x-dx} ${b.y}, ${b.x} ${b.y}`;
+}
+
+// ==========================================================
+// RENDU / RENDERING
+// ==========================================================
+function autosize(el){el.style.height='auto';el.style.height=Math.min(Math.max(el.scrollHeight,30),76)+'px'}
+
+function render(){
+  const pos=positions();
+  const nowRevealed=new Set();
+  walk(root,node=>{if(isRevealed(node))nowRevealed.add(node.id)});
+  const newIds=new Set([...nowRevealed].filter(id=>!revealedBefore.has(id)));
+  const firstRender=revealedBefore.size===0;
+
+  E.nodes.innerHTML='';
+  E.links.innerHTML='';
+  E.links.setAttribute('viewBox',`0 0 ${BOARD_W} ${BOARD_H}`);
+
+  walk(root,node=>{
+    if(!nowRevealed.has(node.id))return;
+
+    if(node.id!=='root'){
+      const parent=parentOf(node);
+      if(parent&&nowRevealed.has(parent.id)){
+        const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+        path.setAttribute('d',linkPath(pos[parent.id],pos[node.id]));
+        path.setAttribute('stroke',branchColor(node));
+        if(newIds.has(node.id)&&!firstRender){
+          const len=path.getTotalLength?.()||900;
+          path.style.strokeDasharray=String(len);
+          path.style.strokeDashoffset=String(len);
+          path.style.setProperty('--branch-delay',`${(node.index||0)*.055}s`);
+          path.classList.add('sprouting');
+        }
+        E.links.appendChild(path);
+      }
+    }
+
+    const el=document.createElement('div');
+    el.className=`node ${node.id==='root'?'central':'level'+node.level} visible`;
+    if(newIds.has(node.id)&&node.id!=='root'&&!firstRender){
+      el.classList.add('growing');
+      el.style.setProperty('--grow-delay',`${.30+(node.index||0)*.055}s`);
+    }
+    if(S.activeId===node.id)el.classList.add('working');
+    el.dataset.id=node.id;
+    el.style.left=pos[node.id].x+'px';
+    el.style.top=pos[node.id].y+'px';
+    if(node.level===4){
+      // La cellule N4 reprend la couleur de son groupe de branches. / Each N4 cell uses its branch-group color.
+      // Les trois enfants d’un même N3 restent ainsi identifiables comme un ensemble. / The three siblings remain visually identifiable as one set.
+      el.style.setProperty('--node-bg',level4GroupColor(node));
+      el.style.background=level4GroupColor(node);
+    }
+
+    const ta=document.createElement('textarea');
+    ta.rows=1;
+    ta.spellcheck=true;
+    ta.value=node.text;
+    ta.placeholder=node.id==='root'?tr('central'):`${tr('level')} ${node.level}`;
+    ta.setAttribute('aria-label',ta.placeholder);
+    ta.addEventListener('pointerdown',e=>e.stopPropagation());
+    ta.addEventListener('click',e=>e.stopPropagation());
+    ta.addEventListener('focus',()=>{ta.dataset.startValue=node.text;setActiveNode(node.id)});
+    ta.addEventListener('input',()=>{
+      node.text=ta.value;
+      autosize(ta);
+      save();
+      renderList();
+    });
+    ta.addEventListener('blur',()=>{
+      const result=commitNode(node,ta.dataset.startValue||'');
+      if(result==='cancelled')return;
+    });
+    ta.addEventListener('keydown',e=>{
+      if(e.key==='Enter'&&!e.shiftKey){
+        e.preventDefault();
+        const changed=commitNode(node,ta.dataset.startValue||'');
+        if(changed==='cancelled')return;
+        const first=node.children[0];
+        if(first&&node.committed&&hasText(node)){
+          // Laisser démarrer l’animation de pousse avant de focaliser l’enfant. / Let the branch-growth animation start before focusing the child.
+          setTimeout(()=>{
+            const fresh=document.querySelector(`.node[data-id="${first.id}"] textarea`);
+            if(fresh)fresh.focus({preventScroll:true});
+          },changed?380:0);
+        }
+      }
+    });
+    el.appendChild(ta);
+    el.addEventListener('pointerdown',e=>e.stopPropagation());
+    E.nodes.appendChild(el);
+    autosize(ta);
+  });
+
+  revealedBefore=nowRevealed;
+  renderList();
+}
+
+// ==========================================================
+// CELLULE ACTIVE ET NAVIGATION / ACTIVE NODE AND NAVIGATION
+// ==========================================================
+function setActiveNode(id){
+  if(!byId(id)||S.activeId===id)return;
+  const previous=document.querySelector('.node.working');
+  if(previous)previous.classList.remove('working');
+  S.activeId=id;
+  const current=document.querySelector(`.node[data-id="${id}"]`);
+  if(current)current.classList.add('working');
+  E.status.textContent='Navigation libre : pincer pour zoomer ; sur ordinateur, Ctrl/Cmd + molette.';
+}
+
+function applyZoom(){E.workspace.style.transform=`scale(${S.zoom})`;E.workspace.style.width=BOARD_W+'px';E.workspace.style.height=BOARD_H+'px'}
+function setZoom(z,anchor=null){
+  const old=S.zoom;
+  const next=Math.max(MIN_Z,Math.min(MAX_Z,z));
+  if(Math.abs(next-old)<.0001)return;
+  let world=null;
+  if(anchor){world={x:(E.scroll.scrollLeft+anchor.x)/old,y:(E.scroll.scrollTop+anchor.y)/old};}
+  S.zoom=next;applyZoom();
+  if(world)requestAnimationFrame(()=>{E.scroll.scrollLeft=Math.max(0,world.x*S.zoom-anchor.x);E.scroll.scrollTop=Math.max(0,world.y*S.zoom-anchor.y)});
+  save();
+}
+
+function centerPoint(x,y,zoom=S.zoom){
+  setZoom(zoom);
+  requestAnimationFrame(()=>{
+    E.scroll.scrollLeft=Math.max(0,x*S.zoom-E.scroll.clientWidth/2);
+    E.scroll.scrollTop=Math.max(0,y*S.zoom-E.scroll.clientHeight/2);
+  });
+}
+function centerOn(id,zoom=S.zoom){const p=positions()[id]||CENTER;centerPoint(p.x,p.y,zoom)}
+function centerRoot(){centerOn('root',S.zoom)}
+
+function visibleBounds(){
+  const pos=positions();
+  const visible=[];
+  walk(root,n=>{if(isRevealed(n))visible.push(pos[n.id])});
+  if(!visible.length)return{x:CENTER.x-500,y:CENTER.y-400,w:1000,h:800};
+  const xs=visible.map(p=>p.x),ys=visible.map(p=>p.y);
+  const minX=Math.min(...xs)-260,maxX=Math.max(...xs)+260,minY=Math.min(...ys)-210,maxY=Math.max(...ys)+210;
+  return{x:minX,y:minY,w:maxX-minX,h:maxY-minY};
+}
+
+function fitMap(){
+  const b=visibleBounds();
+  const zx=(E.scroll.clientWidth-70)/b.w;
+  const zy=(E.scroll.clientHeight-70)/b.h;
+  const z=Math.max(MIN_Z,Math.min(.92,zx,zy));
+  setZoom(z);
+  requestAnimationFrame(()=>{
+    E.scroll.scrollLeft=Math.max(0,(b.x+b.w/2)*S.zoom-E.scroll.clientWidth/2);
+    E.scroll.scrollTop=Math.max(0,(b.y+b.h/2)*S.zoom-E.scroll.clientHeight/2);
+  });
+}
+
+// ==========================================================
+// TERMES, GROUPES ET IDÉES / TERMS, GROUPS AND IDEAS
+// ==========================================================
+function filledNodes(){const a=[];walk(root,n=>{if(hasText(n))a.push(n)});return a}
+function termIds(){return filledNodes().map(n=>n.id)}
+function syncListOrder(){
+  const ids=termIds();
+  S.listOrder=(S.listOrder||[]).filter(id=>ids.includes(id));
+  ids.forEach(id=>{if(!S.listOrder.includes(id))S.listOrder.push(id)});
+  (S.groups||[]).forEach(g=>g.termIds=(g.termIds||[]).filter(id=>ids.includes(id)));
+}
+function orderedTerms(){
+  syncListOrder();
+  const subject=hasText(root)?root:null;
+  const nodes=S.listOrder.map(byId).filter(n=>n&&n.id!=='root'&&hasText(n));
+  const cmpText=(a,b)=>a.text.trim().localeCompare(b.text.trim(),'fr',{sensitivity:'base'});
+  let ordered=nodes;
+  if(S.sort==='az')ordered=[...nodes].sort(cmpText);
+  else if(S.sort==='za')ordered=[...nodes].sort((a,b)=>cmpText(b,a));
+  else if(S.sort==='long')ordered=[...nodes].sort((a,b)=>b.text.trim().length-a.text.trim().length||cmpText(a,b));
+  else if(S.sort==='short')ordered=[...nodes].sort((a,b)=>a.text.trim().length-b.text.trim().length||cmpText(a,b));
+  return subject?[subject,...ordered]:ordered;
+}
+function activeGroup(){return (S.groups||[]).find(g=>g.id===S.activeGroupId)||null}
+function renderGroupSelect(){
+  if(!E.groupSelect)return;
+  E.groupSelect.innerHTML='';
+  const global=document.createElement('option');
+  global.value='';global.textContent=tr('global');E.groupSelect.appendChild(global);
+  (S.groups||[]).forEach(g=>{
+    const o=document.createElement('option');o.value=g.id;o.textContent=g.name;E.groupSelect.appendChild(o);
+  });
+  E.groupSelect.value=S.activeGroupId||'';
+}
+function moveManualTerm(dragId,targetId){
+  if(!dragId||!targetId||dragId===targetId||dragId==='root'||targetId==='root')return;
+  syncListOrder();
+  if(S.sort!=='manual')S.listOrder=orderedTerms().filter(n=>n.id!=='root').map(n=>n.id);
+  const from=S.listOrder.indexOf(dragId),to=S.listOrder.indexOf(targetId);
+  if(from<0||to<0)return;
+  const [id]=S.listOrder.splice(from,1);
+  S.listOrder.splice(to,0,id);
+  S.sort='manual';if(E.sort)E.sort.value='manual';save();renderList();
+}
+let termDrag=null;
+function bindTermDrag(li,id){
+  const handle=li.querySelector('.termDrag');
+  handle?.addEventListener('pointerdown',e=>{
+    termDrag={id,pointerId:e.pointerId,startY:e.clientY,moved:false};
+    try{handle.setPointerCapture(e.pointerId)}catch(err){}
+    li.classList.add('dragging');
+  });
+  handle?.addEventListener('pointermove',e=>{
+    if(!termDrag||termDrag.pointerId!==e.pointerId||termDrag.id!==id)return;
+    if(Math.abs(e.clientY-termDrag.startY)>6)termDrag.moved=true;
+    if(!termDrag.moved)return;
+    const el=document.elementFromPoint(e.clientX,e.clientY)?.closest('.termItem');
+    document.querySelectorAll('.termItem.drag-over').forEach(x=>x.classList.remove('drag-over'));
+    if(el&&el.dataset.termId!==id)el.classList.add('drag-over');
+  });
+  const end=e=>{
+    if(!termDrag||termDrag.pointerId!==e.pointerId||termDrag.id!==id)return;
+    const target=document.elementFromPoint(e.clientX,e.clientY)?.closest('.termItem');
+    li.classList.remove('dragging');
+    document.querySelectorAll('.termItem.drag-over').forEach(x=>x.classList.remove('drag-over'));
+    const moved=termDrag.moved;termDrag=null;
+    if(moved&&target)moveManualTerm(id,target.dataset.termId);
+  };
+  handle?.addEventListener('pointerup',end);handle?.addEventListener('pointercancel',end);
+}
+function renderTerms(){
+  const hiddenToggle=document.querySelector('[data-toggle-hidden]');
+  if(hiddenToggle){const count=(S.hiddenTermIds||[]).length;hiddenToggle.textContent=S.showHiddenTerms?`${tr('hideHidden')} (${count})`:`${tr('showHidden')} (${count})`;hiddenToggle.disabled=!count;}
+  const viewToggle=document.querySelector('[data-term-view]');
+  if(viewToggle){viewToggle.textContent=S.termDisplay==='flow'?tr('listViewMode'):tr('simpleView');viewToggle.classList.toggle('active',S.termDisplay==='flow');}
+  let terms=orderedTerms();
+  const group=activeGroup();
+  if(group){
+    const allowed=new Set(group.termIds||[]);
+    // Le sujet central reste systématiquement en tête de chaque groupe. / The central subject always remains first in every group.
+    terms=terms.filter(n=>n.id==='root'||allowed.has(n.id));
+  }
+  const hidden=new Set(S.hiddenTermIds||[]);
+  if(!S.showHiddenTerms)terms=terms.filter(n=>n.id==='root'||!hidden.has(n.id));
+  if(!terms.length){
+    E.listBody.innerHTML=`<p class="listEmpty">${group?tr('noGroupTerms'):tr('noTerms')}</p>`;
+    return;
+  }
+  const frag=document.createDocumentFragment();
+  if(group){
+    const hint=document.createElement('p');hint.className='groupHint';hint.textContent=`${tr('groupLabel')} « ${group.name} »`;
+    frag.appendChild(hint);
+  }
+
+  // Vue simple : texte brut côte à côte, avec retour automatique à la ligne. / Simple view: raw terms side by side with automatic wrapping.
+  if(S.termDisplay==='flow'){
+    const flow=document.createElement('div');flow.className='termFlow';
+    terms.forEach(n=>{
+      const word=document.createElement('button');word.type='button';
+      const selectable=!group&&n.id!=='root';
+      const selected=(S.selectedTermIds||[]).includes(n.id);
+      word.className='termFlowWord'+(n.id==='root'?' subject':'')+(selectable?' selectable':'')+(selected?' selected':'')+(hidden.has(n.id)?' is-hidden':'');
+      word.textContent=n.text.trim();word.dataset.termId=n.id;
+      if(selectable){
+        word.title=tr('selectGroup');
+        word.addEventListener('click',()=>{
+          S.selectedTermIds=S.selectedTermIds||[];
+          if(S.selectedTermIds.includes(n.id))S.selectedTermIds=S.selectedTermIds.filter(id=>id!==n.id);
+          else S.selectedTermIds.push(n.id);
+          save();renderTerms();
+        });
+      }else word.tabIndex=-1;
+      flow.appendChild(word);
+    });
+    frag.appendChild(flow);E.listBody.innerHTML='';E.listBody.appendChild(frag);return;
+  }
+
+  const ul=document.createElement('ul');ul.className='termList';
+  terms.forEach(n=>{
+    const li=document.createElement('li');li.className='termItem'+(n.id==='root'?' subject':'')+(hidden.has(n.id)?' is-hidden':'');li.dataset.termId=n.id;
+
+    // Dans la liste générale, les cases préparent le prochain groupe. / In the global list, checkboxes prepare the next group.
+    if(!group&&n.id!=='root'){
+      const cb=document.createElement('input');cb.type='checkbox';cb.className='termCheck';
+      cb.checked=(S.selectedTermIds||[]).includes(n.id);
+      cb.setAttribute('aria-label',`${tr('selectGroup')} ${n.text.trim()}`);
+      cb.addEventListener('change',()=>{
+        S.selectedTermIds=S.selectedTermIds||[];
+        if(cb.checked){if(!S.selectedTermIds.includes(n.id))S.selectedTermIds.push(n.id)}
+        else S.selectedTermIds=S.selectedTermIds.filter(id=>id!==n.id);
+        save();
+      });
+      li.appendChild(cb);
+    }
+
+    const text=document.createElement('span');text.className='termText';text.textContent=n.text.trim();li.appendChild(text);
+
+    if(n.id!=='root'){
+      const hide=document.createElement('button');hide.type='button';hide.className='termHide';
+      hide.textContent=hidden.has(n.id)?'◉':'⊘';
+      hide.title=hidden.has(n.id)?tr('rehide'):tr('hide');
+      hide.setAttribute('aria-label',hide.title);
+      hide.addEventListener('click',()=>{
+        S.hiddenTermIds=S.hiddenTermIds||[];
+        if(hidden.has(n.id))S.hiddenTermIds=S.hiddenTermIds.filter(id=>id!==n.id);
+        else if(!S.hiddenTermIds.includes(n.id))S.hiddenTermIds.push(n.id);
+        save();renderList();
+      });
+      li.appendChild(hide);
+    }
+
+    // Le sujet central reste fixe en tête ; seul le reste se réordonne manuellement. / The central subject stays first; only the other terms can be manually reordered.
+    if(n.id!=='root'&&!group){
+      const drag=document.createElement('span');drag.className='termDrag';drag.textContent='⋮⋮';drag.setAttribute('aria-hidden','true');li.appendChild(drag);
+      bindTermDrag(li,n.id);
+    }
+    ul.appendChild(li);
+  });
+  frag.appendChild(ul);E.listBody.innerHTML='';E.listBody.appendChild(frag);
+}
+function uid(prefix='id'){return prefix+'_'+Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4)}
+function createGroup(){
+  const selected=(S.selectedTermIds||[]).filter(id=>id!=='root'&&byId(id)&&hasText(byId(id)));
+  if(!selected.length){E.status.textContent=tr('selectFirst');return;}
+  const name=(prompt(tr('groupName'),'')||'').trim();if(!name)return;
+  const g={id:uid('g'),name,termIds:[...selected]};
+  S.groups=S.groups||[];S.groups.push(g);
+  S.selectedTermIds=[];
+  S.activeGroupId=g.id;
+  S.listView='terms';
+  save();renderList();
+}
+function deleteActiveGroup(){
+  const group=activeGroup();
+  if(!group)return;
+  if(!confirm(`${tr('deleteGroupQ')} « ${group.name} » ?`))return;
+  S.groups=(S.groups||[]).filter(g=>g.id!==group.id);
+  S.activeGroupId=null;
+  S.listView='terms';
+  save();renderList();
+  E.status.textContent=tr('groupDeleted');
+}
+function renderIdeaEditor(idea=null){
+  E.listTitle.textContent=idea?tr('editIdea'):tr('newIdea');
+  E.listTools.style.display='none';
+  const wrap=document.createElement('div');wrap.className='ideaPanel';
+  wrap.innerHTML=`<label>${tr('ideaTitle')}</label><input data-idea-title value="${idea?escHtml(idea.title):''}" placeholder="${tr('ideaTitlePh')}"><label>${tr('ideaLabel')}</label><textarea data-idea-note placeholder="${tr('ideaPh')}">${idea?escHtml(idea.note):''}</textarea><div class="ideaActions"><button class="btn primary" type="button" data-idea-save>${tr('save')}</button><button class="btn" type="button" data-idea-cancel>${tr('cancel')}</button></div>`;
+  E.listBody.innerHTML='';E.listBody.appendChild(wrap);
+  wrap.querySelector('[data-idea-save]').addEventListener('click',()=>{
+    const title=wrap.querySelector('[data-idea-title]').value.trim();const note=wrap.querySelector('[data-idea-note]').value.trim();
+    if(!title&&!note)return;
+    if(idea){idea.title=title||'Sans titre';idea.note=note;S.activeIdeaId=idea.id}else{const x={id:uid('idea'),title:title||'Sans titre',note};S.ideas=S.ideas||[];S.ideas.push(x);S.activeIdeaId=x.id}
+    const returnSpace=S.ideaReturnSpace;
+    S.ideaReturnSpace=null;
+    S.listView='ideas';save();
+    if(returnSpace&&returnSpace!=='ideas')setSpace(returnSpace);else renderList();
+  });
+  wrap.querySelector('[data-idea-cancel]').addEventListener('click',()=>{const returnSpace=S.ideaReturnSpace;S.ideaReturnSpace=null;S.listView='ideas';if(returnSpace&&returnSpace!=='ideas')setSpace(returnSpace);else renderList()});
+  setTimeout(()=>wrap.querySelector('[data-idea-title]').focus(),20);
+}
+function escHtml(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function renderIdeas(){
+  E.listTitle.textContent=tr('createdIdeas');E.listTools.style.display='none';
+  const ideas=S.ideas||[];
+  if(!ideas.length){E.listBody.innerHTML=`<div class="ideaPanel"><p class="listEmpty">${tr('noIdeas')}</p></div>`;return}
+  if(!ideas.some(x=>x.id===S.activeIdeaId))S.activeIdeaId=ideas[0].id;
+  const wrap=document.createElement('div');wrap.className='ideaPanel';
+  const select=document.createElement('select');select.className='ideaSelect';
+  ideas.forEach(x=>{const o=document.createElement('option');o.value=x.id;o.textContent=x.title||tr('untitled');select.appendChild(o)});select.value=S.activeIdeaId;
+  const viewer=document.createElement('div');viewer.className='ideaViewer';
+  const renderViewer=()=>{const x=ideas.find(i=>i.id===select.value);if(!x)return;S.activeIdeaId=x.id;viewer.innerHTML=`<h3>${escHtml(x.title||tr('untitled'))}</h3><p>${escHtml(x.note||'')}</p><div class="ideaActions" style="margin-top:12px"><button class="btn" type="button" data-edit-idea>${tr('edit')}</button><button class="btn danger" type="button" data-delete-idea>${tr('deleteIdea')}</button></div>`;viewer.querySelector('[data-edit-idea]').onclick=()=>{S.listView='ideaEdit';renderIdeaEditor(x)};viewer.querySelector('[data-delete-idea]').onclick=()=>{if(!confirm(tr('deleteIdeaQ')))return;S.ideas=S.ideas.filter(i=>i.id!==x.id);S.activeIdeaId=S.ideas[0]?.id||null;save();renderIdeas()};};
+  select.addEventListener('change',()=>{renderViewer();save()});wrap.appendChild(select);wrap.appendChild(viewer);E.listBody.innerHTML='';E.listBody.appendChild(wrap);renderViewer();
+}
+function openNewIdea(){
+  S.ideaReturnSpace=S.space||'map';
+  S.space='ideas';
+  S.listOpen=true;
+  S.listView='ideaNew';
+  E.listPanel.classList.add('open');
+  E.listPanel.setAttribute('aria-hidden','false');
+  updateSpaceNav();
+  renderList();
+  E.status.textContent=tr('newIdea')+'.';
+}
+function updateSpaceNav(){
+  E.spaceMap?.classList.toggle('active',S.space==='map');
+  E.spaceList?.classList.toggle('active',S.space==='list');
+  E.spaceIdeas?.classList.toggle('active',S.space==='ideas');
+}
+function renderList(){
+  if(!E.listBody)return;
+  syncListOrder();
+  if(E.sort)E.sort.value=S.sort||'manual';
+  const headActions=document.querySelector('[data-list-head-actions]');
+  if(headActions)headActions.innerHTML='';
+  if(S.listView==='ideas'){
+    renderIdeas();return
+  }
+  if(S.listView==='ideaNew'||S.listView==='ideaEdit'){renderIdeaEditor(S.listView==='ideaEdit'?(S.ideas||[]).find(x=>x.id===S.activeIdeaId)||null:null);return}
+  const group=activeGroup();
+  E.listTitle.textContent=group?`${tr('groupLabel')} — ${group.name}`:tr('terms');
+  E.listTools.style.display='flex';
+  renderGroupSelect();
+  if(E.deleteGroup)E.deleteGroup.style.display=group?'inline-flex':'none';
+  renderTerms();
+}
+function setSpace(space){
+  S.space=space;
+  S.listOpen=space!=='map';
+  if(space==='list')S.listView='terms';
+  if(space==='ideas'){S.ideaReturnSpace=null;S.listView='ideas';}
+  E.listPanel.classList.toggle('open',S.listOpen);
+  E.listPanel.setAttribute('aria-hidden',String(!S.listOpen));
+  updateSpaceNav();
+  if(S.listOpen)renderList();
+  E.status.textContent=space==='map'?tr('mapStatus'):space==='list'?tr('termsStatus'):tr('ideasStatus');
+}
+function toggleList(force){setSpace((typeof force==='boolean'?force:!S.listOpen)?'list':'map')}
+// ==========================================================
+// STOCKAGE LOCAL / LOCAL STORAGE
+// ==========================================================
+function serialize(){const nodes=[];walk(root,n=>nodes.push({id:n.id,text:n.text,committed:n.committed}));return{app:'pop',version:'1.0.0',workName:S.workName||'',space:S.space||'map',theme:S.theme||'night',lang:S.lang||'fr',updatedAt:new Date().toISOString(),zoom:S.zoom,nodes,listOrder:S.listOrder||[],sort:S.sort||'manual',groups:S.groups||[],activeGroupId:S.activeGroupId||null,selectedTermIds:S.selectedTermIds||[],hiddenTermIds:S.hiddenTermIds||[],showHiddenTerms:!!S.showHiddenTerms,termDisplay:S.termDisplay||'flow',ideas:S.ideas||[],activeIdeaId:S.activeIdeaId||null}}
+function snapshot(){const d=serialize();delete d.updatedAt;return JSON.stringify(d)}
+function updateHistoryButtons(){if(E.undo)E.undo.disabled=!HISTORY.undo.length;if(E.redo)E.redo.disabled=!HISTORY.redo.length}
+function save(){
+  try{
+    const current=snapshot();
+    if(!HISTORY.restoring){
+      if(HISTORY.last===null)HISTORY.last=current;
+      else if(current!==HISTORY.last){
+        const now=Date.now();
+        if(now-HISTORY.lastPush>450){HISTORY.undo.push(HISTORY.last);if(HISTORY.undo.length>80)HISTORY.undo.shift();HISTORY.redo=[];HISTORY.lastPush=now;}
+        HISTORY.last=current;
+      }
+    }
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(serialize()));
+    updateHistoryButtons();
+  }catch(e){}
+}
+function applyData(data,{renderNow=true}={}){
+  if(!data||typeof data!=='object')return false;
+  if(Array.isArray(data.nodes))data.nodes.forEach(x=>{const n=byId(x.id);if(n&&typeof x.text==='string'){n.text=x.text;n.committed=typeof x.committed==='boolean'?x.committed:!!x.text.trim()}});
+  if(Number.isFinite(data.zoom))S.zoom=Math.max(MIN_Z,Math.min(MAX_Z,data.zoom));
+  S.listOrder=Array.isArray(data.listOrder)?data.listOrder:[];S.sort=typeof data.sort==='string'?data.sort:'manual';S.groups=Array.isArray(data.groups)?data.groups:[];S.activeGroupId=data.activeGroupId||null;S.selectedTermIds=Array.isArray(data.selectedTermIds)?data.selectedTermIds:[];S.hiddenTermIds=Array.isArray(data.hiddenTermIds)?data.hiddenTermIds:[];S.showHiddenTerms=!!data.showHiddenTerms;S.termDisplay=data.termDisplay==='list'?'list':'flow';S.ideas=Array.isArray(data.ideas)?data.ideas:[];S.activeIdeaId=data.activeIdeaId||null;S.workName=typeof data.workName==='string'?data.workName:'';S.space=['map','list','ideas'].includes(data.space)?data.space:'map';S.theme=['day','night','unicorn'].includes(data.theme)?data.theme:'night';S.lang=['fr','en'].includes(data.lang)?data.lang:'fr';
+  if(E.workName)E.workName.value=S.workName||'';applyTheme();applyZoom();
+  if(renderNow){render();setSpace(S.space||'map');}
+  return true;
+}
+function load(){try{const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return;applyData(JSON.parse(raw),{renderNow:false})}catch(e){}}
+function restoreSnapshot(raw,msg){try{HISTORY.restoring=true;const d=JSON.parse(raw);applyData(d);localStorage.setItem(STORAGE_KEY,JSON.stringify(serialize()));HISTORY.last=snapshot();HISTORY.restoring=false;updateHistoryButtons();if(msg)E.status.textContent=msg}catch(e){HISTORY.restoring=false}}
+function undo(){if(!HISTORY.undo.length)return;const cur=snapshot();const prev=HISTORY.undo.pop();HISTORY.redo.push(cur);restoreSnapshot(prev,tr('undoDone'))}
+function redo(){if(!HISTORY.redo.length)return;const cur=snapshot();const next=HISTORY.redo.pop();HISTORY.undo.push(cur);restoreSnapshot(next,tr('redoDone'))}
+function applyTheme(){document.documentElement.dataset.theme=S.theme||'night';if(E.themeSelect)E.themeSelect.value=S.theme||'night'}
+function setTheme(theme){S.theme=['day','night','unicorn'].includes(theme)?theme:'night';applyTheme();save()}
+function resetAll(){
+  if(!confirm(tr('resetQ')))return;
+  walk(root,n=>{n.text='';n.committed=false});
+  S.activeId=null;S.zoom=.72;S.space='map';S.listOrder=[];S.sort='manual';S.groups=[];S.activeGroupId=null;S.selectedTermIds=[];S.hiddenTermIds=[];S.showHiddenTerms=false;S.termDisplay='flow';S.ideas=[];S.activeIdeaId=null;S.workName='';S.listView='terms';S.theme='night';revealedBefore=new Set();HISTORY={undo:[],redo:[],last:null,lastPush:0,restoring:false};applyTheme();updateHistoryButtons();
+  if(E.workName)E.workName.value='';
+  localStorage.removeItem(STORAGE_KEY);
+  render();applyZoom();centerRoot();
+  E.status.textContent=tr('start');
+}
+
+
+function safeFileName(v){return String(v||'pop').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9_-]+/gi,'_').replace(/^_+|_+$/g,'').toLowerCase()||'pop'}
+function exportJSON(){
+  const name=(E.workName?.value||S.workName||'').trim();
+  if(!name){E.workName?.focus();E.status.textContent=tr('needName');return;}
+  S.workName=name;save();
+  const blob=new Blob([JSON.stringify(serialize(),null,2)],{type:'application/json;charset=utf-8'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='pop_'+safeFileName(name)+'.json';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+  E.status.textContent=S.lang==='en'?`Work “${name}” ${tr('saved')}`:`Travail « ${name} » ${tr('saved')}`;
+}
+function showGlobalList(){S.activeGroupId=null;S.listView='terms';save();renderList();E.status.textContent=tr('globalStatus');}
+function printEscape(str){return String(str||'').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function openPrintDocument(title,bodyHtml){
+  const project=(S.workName||E.workName?.value||'Pop!').trim()||'Pop!';
+  const doc=`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${printEscape(project)} — ${printEscape(title)}</title><style>
+  @page{size:A4;margin:16mm 15mm}*{box-sizing:border-box}body{margin:0;background:#fff;color:#1f2a2d;font-family:Inter,Arial,sans-serif;font-size:10pt;line-height:1.42}.content{padding-top:2mm}.printHead{display:flex;justify-content:space-between;align-items:baseline;gap:8mm;margin:0 0 8mm;padding-bottom:4mm;border-bottom:2px solid #D8D0C1}.printHead h1{margin:0;color:#1F3A44;font-size:20pt;letter-spacing:-.03em}.printHead span{color:#A63D40;font-size:9pt;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.sectionTitle{display:none}.termFlow{margin:0;padding:0;font-size:11pt;line-height:2.05}.termFlow .term{display:inline;white-space:normal;margin-right:2.5em;font-weight:650}.termFlow .subjectTerm{color:#A63D40;font-weight:900}.groupLabel{margin:0 0 6mm;color:#A63D40;font-size:9pt;font-weight:900;letter-spacing:.11em;text-transform:uppercase}.idea{break-inside:avoid;margin:0 0 6mm;padding:6mm;border:1px solid #D8D0C1;border-radius:5mm;background:#fff}.idea h3{margin:0 0 3mm;color:#1F3A44;font-size:14pt;line-height:1.15}.idea p{margin:0;white-space:pre-wrap;color:#1f2a2d}.ideaNo{margin-bottom:2mm;color:#A63D40;font-size:7pt;font-weight:900;letter-spacing:.1em;text-transform:uppercase}@media print{.idea{break-inside:avoid;page-break-inside:avoid}}</style></head><body><main class="content"><header class="printHead"><h1>${printEscape(project)}</h1><span>${printEscape(title)}</span></header>${bodyHtml}</main></body></html>`;
+  const win=window.open('','_blank');
+  if(!win){alert(tr('printPopup'));return;}
+  win.document.open();win.document.write(doc);win.document.close();win.focus();setTimeout(()=>win.print(),350);
+}
+function termsForPrint(){
+  let terms=orderedTerms();
+  const group=activeGroup();
+  if(group){const allowed=new Set(group.termIds||[]);terms=terms.filter(n=>n.id==='root'||allowed.has(n.id));}
+  const hidden=new Set(S.hiddenTermIds||[]);terms=terms.filter(n=>n.id==='root'||!hidden.has(n.id));
+  return {terms,group};
+}
+function printTerms(){
+  toggleSettings(false);
+  const {terms,group}=termsForPrint();
+  if(!terms.length){alert(tr('noPrintTerms'));return;}
+  const subject=terms.find(n=>n.id==='root');
+  const others=terms.filter(n=>n.id!=='root');
+  const groupHtml=group?`<div class="groupLabel">${tr('groupLabel')} — ${printEscape(group.name)}</div>`:`<div class="groupLabel">${tr('global')}</div>`;
+  const flow=[];
+  if(subject)flow.push(`<span class="term subjectTerm">${printEscape(subject.text.trim())}</span>`);
+  others.forEach(n=>flow.push(`<span class="term">${printEscape(n.text.trim())}</span>`));
+  const listHtml=flow.length?`<p class="termFlow">${flow.join('')}</p>`:`<p>${tr('noOther')}</p>`;
+  openPrintDocument(group?`${tr('terms')} — ${group.name}`:tr('terms'),`<h1 class="sectionTitle">${tr('terms')}</h1>${groupHtml}${listHtml}`);
+}
+function printIdeas(){
+  toggleSettings(false);
+  const ideas=(S.ideas||[]).filter(i=>(i.title||'').trim()||(i.note||'').trim());
+  if(!ideas.length){alert(tr('noPrintIdeas'));return;}
+  const cards=ideas.map((idea,i)=>`<article class="idea"><div class="ideaNo">${tr('idea')} ${String(i+1).padStart(2,'0')}</div><h3>${printEscape((idea.title||'').trim()||tr('untitled'))}</h3><p>${printEscape((idea.note||'').trim()||'—')}</p></article>`).join('');
+  openPrintDocument(tr('ideas'),`<h1 class="sectionTitle">${tr('ideas')}</h1>${cards}`);
+}
+function importJSONFile(file){if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const data=JSON.parse(String(reader.result||''));if(data.app&&data.app!=='pop'&&data.app!=='creamap')throw new Error('format');HISTORY.undo.push(snapshot());HISTORY.redo=[];HISTORY.restoring=true;applyData(data);HISTORY.restoring=false;HISTORY.last=snapshot();save();updateHistoryButtons();E.status.textContent=tr('loaded')}catch(e){alert(tr('badJson'))}};reader.readAsText(file);}
+function toggleSettings(force){const open=typeof force==='boolean'?force:!E.settingsMenu.classList.contains('open');E.settingsMenu.classList.toggle('open',open);E.settingsToggle.setAttribute('aria-expanded',String(open));}
+function openInfo(){E.infoModal.classList.add('open');E.infoModal.setAttribute('aria-hidden','false');toggleSettings(false)}
+function closeInfo(){E.infoModal.classList.remove('open');E.infoModal.setAttribute('aria-hidden','true')}
+
+// ==========================================================
+// DÉPLACEMENT ET ZOOM DE LA VUE / VIEW PANNING AND ZOOM
+// ==========================================================
+let pan=null;
+const pointers=new Map();
+let pinch=null;
+
+function localPoint(e){const r=E.scroll.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+function pointerDistance(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+function pointerMid(a,b){return{x:(a.x+b.x)/2,y:(a.y+b.y)/2}}
+
+E.scroll.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='touch'){
+    pointers.set(e.pointerId,localPoint(e));
+    try{E.scroll.setPointerCapture(e.pointerId)}catch(err){}
+    if(pointers.size===2){
+      const pts=[...pointers.values()];
+      const mid=pointerMid(pts[0],pts[1]);
+      pinch={distance:pointerDistance(pts[0],pts[1]),zoom:S.zoom,worldX:(E.scroll.scrollLeft+mid.x)/S.zoom,worldY:(E.scroll.scrollTop+mid.y)/S.zoom};
+      pan=null;E.scroll.classList.add('dragging');
+      e.preventDefault();
+      return;
+    }
+    if(!e.target.closest('.node,textarea,button')){
+      pan={x:e.clientX,y:e.clientY,left:E.scroll.scrollLeft,top:E.scroll.scrollTop,id:e.pointerId,touch:true};
+      E.scroll.classList.add('dragging');
+      e.preventDefault();
+    }
+    return;
+  }
+  if(e.button!==0||e.target.closest('.node,.btn,textarea,button'))return;
+  pan={x:e.clientX,y:e.clientY,left:E.scroll.scrollLeft,top:E.scroll.scrollTop,id:e.pointerId,touch:false};
+  try{E.scroll.setPointerCapture(e.pointerId)}catch(err){}
+  E.scroll.classList.add('dragging');
+},{capture:true});
+
+E.scroll.addEventListener('pointermove',e=>{
+  if(e.pointerType==='touch'&&pointers.has(e.pointerId)){
+    pointers.set(e.pointerId,localPoint(e));
+    if(pinch&&pointers.size>=2){
+      const pts=[...pointers.values()].slice(0,2);
+      const mid=pointerMid(pts[0],pts[1]);
+      const dist=Math.max(20,pointerDistance(pts[0],pts[1]));
+      S.zoom=Math.max(MIN_Z,Math.min(MAX_Z,pinch.zoom*(dist/pinch.distance)));
+      applyZoom();
+      E.scroll.scrollLeft=Math.max(0,pinch.worldX*S.zoom-mid.x);
+      E.scroll.scrollTop=Math.max(0,pinch.worldY*S.zoom-mid.y);
+      e.preventDefault();
+      return;
+    }
+  }
+  if(!pan||pan.id!==e.pointerId)return;
+  E.scroll.scrollLeft=pan.left-(e.clientX-pan.x);
+  E.scroll.scrollTop=pan.top-(e.clientY-pan.y);
+  e.preventDefault();
+},{capture:true});
+
+function stopPointer(e){
+  if(e?.pointerId!=null)pointers.delete(e.pointerId);
+  if(pointers.size<2&&pinch){pinch=null;save()}
+  if(pan&&(!e||e.pointerId===pan.id))pan=null;
+  if(!pan&&!pinch)E.scroll.classList.remove('dragging');
+}
+E.scroll.addEventListener('pointerup',stopPointer,{capture:true});
+E.scroll.addEventListener('pointercancel',stopPointer,{capture:true});
+
+// Ordinateur : Ctrl/Cmd + molette zoome autour du pointeur. / Desktop: Ctrl/Cmd + wheel zooms around the pointer.
+E.scroll.addEventListener('wheel',e=>{
+  if(!(e.ctrlKey||e.metaKey))return;
+  e.preventDefault();
+  const p=localPoint(e);
+  const factor=Math.exp(-e.deltaY*.0015);
+  setZoom(S.zoom*factor,p);
+},{passive:false});
+
+// ==========================================================
+// COMMANDES / CONTROLS
+// ==========================================================
+E.spaceMap.addEventListener('click',()=>setSpace('map'));
+E.spaceList.addEventListener('click',()=>setSpace('list'));
+E.spaceIdeas.addEventListener('click',()=>setSpace('ideas'));
+document.querySelector('[data-new-idea]').addEventListener('click',openNewIdea);
+document.querySelector('[data-new-group]').addEventListener('click',createGroup);
+E.deleteGroup?.addEventListener('click',deleteActiveGroup);
+document.querySelector('[data-global-list]').addEventListener('click',showGlobalList);
+E.groupSelect.addEventListener('change',()=>{S.activeGroupId=E.groupSelect.value||null;S.listView='terms';save();renderList()});
+E.workName.addEventListener('input',()=>{S.workName=E.workName.value;save()});
+document.querySelector('[data-export-json]').addEventListener('click',()=>{toggleSettings(false);exportJSON()});
+document.querySelector('[data-import-json]').addEventListener('click',()=>E.importFile.click());
+document.querySelector('[data-toggle-hidden]').addEventListener('click',()=>{S.showHiddenTerms=!S.showHiddenTerms;save();renderList();});
+document.querySelector('[data-term-view]').addEventListener('click',()=>{S.termDisplay=S.termDisplay==='flow'?'list':'flow';save();renderList();});
+document.querySelector('[data-print-terms]').addEventListener('click',printTerms);
+document.querySelector('[data-print-ideas]').addEventListener('click',printIdeas);
+E.importFile.addEventListener('change',()=>{const file=E.importFile.files?.[0];if(file)importJSONFile(file);E.importFile.value=''});
+E.settingsToggle.addEventListener('click',e=>{e.stopPropagation();toggleSettings()});
+E.settingsMenu.addEventListener('click',e=>e.stopPropagation());
+document.addEventListener('click',()=>toggleSettings(false));
+E.themeSelect.addEventListener('change',()=>setTheme(E.themeSelect.value));
+E.languageSelect.addEventListener('change',()=>setLanguage(E.languageSelect.value));
+document.querySelector('[data-info]').addEventListener('click',openInfo);
+document.querySelector('[data-info-close]').addEventListener('click',closeInfo);
+E.infoModal.addEventListener('click',e=>{if(e.target===E.infoModal)closeInfo()});
+E.undo.addEventListener('click',undo);E.redo.addEventListener('click',redo);
+E.sort.addEventListener('change',()=>{S.sort=E.sort.value;save();renderList()});
+document.querySelector('[data-zoom-in]').addEventListener('click',()=>setZoom(S.zoom+.08,{x:E.scroll.clientWidth/2,y:E.scroll.clientHeight/2}));
+document.querySelector('[data-zoom-out]').addEventListener('click',()=>setZoom(S.zoom-.08,{x:E.scroll.clientWidth/2,y:E.scroll.clientHeight/2}));
+document.querySelector('[data-fit]').addEventListener('click',fitMap);
+document.querySelector('[data-reset]').addEventListener('click',resetAll);
+window.addEventListener('resize',()=>{});
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&e.key.toLowerCase()==='z'){e.preventDefault();undo();return}
+  if((e.ctrlKey||e.metaKey)&&((e.shiftKey&&e.key.toLowerCase()==='z')||e.key.toLowerCase()==='y')){e.preventDefault();redo();return}
+  if(e.key==='Escape'&&E.infoModal.classList.contains('open')){closeInfo();return}
+  if(e.key==='Escape'&&S.space!=='map'){setSpace('map');return}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='l'){e.preventDefault();setSpace('list')}
+  if((e.ctrlKey||e.metaKey)&&(e.key==='+'||e.key==='=')){e.preventDefault();setZoom(S.zoom+.08,{x:E.scroll.clientWidth/2,y:E.scroll.clientHeight/2})}
+  if((e.ctrlKey||e.metaKey)&&e.key==='-'){e.preventDefault();setZoom(S.zoom-.08,{x:E.scroll.clientWidth/2,y:E.scroll.clientHeight/2})}
+});
+
+// ==========================================================
+// INITIALISATION / INITIALIZATION
+// ==========================================================
+load();
+if(E.workName)E.workName.value=S.workName||'';
+applyTheme();applyLanguage();applyZoom();
+render();
+HISTORY.last=snapshot();updateHistoryButtons();
+setSpace(S.space||'map');
+requestAnimationFrame(()=>{
+  if(hasText(root))fitMap();else centerRoot();
+  const rootInput=document.querySelector('.node.central textarea');
+  if(rootInput&&!hasText(root))setTimeout(()=>rootInput.focus(),80);
+});
+})();
+</script>
+</body>
+</html>
